@@ -85,10 +85,10 @@ try {
 
   console.log(`${colors.bright}🔗 Application:${colors.reset}`);
   console.log(
-    `${colors.bright}📚 API Documentation:${colors.reset} http://localhost:3000/api-docs`
+    `${colors.bright}📚 API Documentation:${colors.reset} http://localhost:8080/api-docs`
   );
   console.log(
-    `${colors.bright}🔧 Server:${colors.reset} http://localhost:3000\n`
+    `${colors.bright}🔧 Server:${colors.reset} http://localhost:8080\n`
   );
   console.log(`${colors.green}Happy coding! 💻${colors.reset}\n`);
 } catch (error) {
