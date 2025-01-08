@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/formit?schema=public
+      - JWT_SECRET=bobbylagotto6202
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - FRONTEND_URL=http://localhost:8080
+      - NODE_ENV=development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "npm install &&
+             npm run prisma:generate &&
+             npm run prisma:migrate &&
+             npm run dev"
+
+  db:
+    image: postgres:14-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=formit
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: jcalonso/mailhog:latest
+    platform: linux/arm64
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web interface
+
+volumes:
+  postgres_data:
