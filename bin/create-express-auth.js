@@ -71,7 +71,8 @@ try {
     `4. Run ${colors.cyan}npm run prisma:generate${colors.reset} to generate Prisma client`
   );
   console.log(
-    `5. Run ${colors.cyan}npm run prisma:migrate${colors.reset} to initialize the database`
+    `5. Create initial migration:\n` +
+      `   ${colors.cyan}npx prisma migrate dev --name init${colors.reset}\n`
   );
   console.log(
     `6. Start the server with ${colors.cyan}npm run dev${colors.reset}\n`

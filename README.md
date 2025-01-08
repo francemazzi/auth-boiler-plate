@@ -35,33 +35,46 @@ src/
 
 ## 🚀 Getting Started
 
-1. **Environment Setup**
+1. **Project Setup**
 
    ```bash
-   # Create .env file from example
-   cp .env.example .env
+   # Create and configure your project
+   npx create-express-auth my-app
+   cd my-app
    ```
 
-2. **Start Docker Services**
+2. **Configuration**
+
+   ```bash
+   # Initialize configuration interactively
+   npm run config:init
+   ```
+
+   This will:
+
+   - Create a `config.toml` file with your settings
+   - Generate the `.env` file automatically
+   - Update `docker-compose.yml` with your configuration
+
+3. **Start Services**
 
    ```bash
    # Start PostgreSQL and MailHog
    docker-compose up -d
    ```
 
-3. **Database Setup**
+4. **Database Setup**
 
    ```bash
    # Generate Prisma client
    npm run prisma:generate
 
-   # Run migrations
-   npm run prisma:migrate
+   # Create initial migration
+   npx prisma migrate dev --name init
    ```
 
-4. **Start the Server**
+5. **Start Development Server**
    ```bash
-   # Development mode
    npm run dev
    ```
 
