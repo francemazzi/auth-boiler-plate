@@ -7,7 +7,6 @@ A modern boilerplate to quickly create a Node.js server with Express, TypeScript
 ```bash
 npx create-express-auth my-app
 cd my-app
-npm run dev
 ```
 
 ## 🛠 Tech Stack
@@ -20,6 +19,7 @@ npm run dev
 - **Swagger** - API documentation
 - **Winston** - Logging
 - **Jest** - Testing
+- **Docker** - Containerization for PostgreSQL and MailHog
 
 ## 🗂 Project Structure
 
@@ -35,33 +35,46 @@ src/
 
 ## 🚀 Getting Started
 
-1. **Database Setup**
+1. **Environment Setup**
 
    ```bash
    # Create .env file from example
    cp .env.example .env
+   ```
 
-   # Configure your database in .env
-   DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+2. **Start Docker Services**
+
+   ```bash
+   # Start PostgreSQL and MailHog
+   docker-compose up -d
+   ```
+
+3. **Database Setup**
+
+   ```bash
+   # Generate Prisma client
+   npm run prisma:generate
 
    # Run migrations
    npm run prisma:migrate
    ```
 
-2. **Start the Server**
-
+4. **Start the Server**
    ```bash
    # Development mode
    npm run dev
-
-   # Production
-   npm run build
-   npm start
    ```
 
-3. **Verify Installation**
-   - Server: http://localhost:3000
-   - API Documentation: http://localhost:3000/api-docs
+## 🐳 Docker Services
+
+- **PostgreSQL**: Running on `localhost:5432`
+- **MailHog** (Email Testing): Available at `http://localhost:8025`
+
+## 🔗 Application URLs
+
+- **API Server**: http://localhost:3000
+- **API Documentation**: http://localhost:3000/api-docs
+- **Email Testing UI**: http://localhost:8025
 
 ## 📝 API Endpoints
 
