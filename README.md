@@ -1,8 +1,8 @@
 # Express Auth Boilerplate 🚀
 
-Un boiler plate moderno per creare rapidamente un server Node.js con Express, TypeScript, Prisma e PostgreSQL, completo di autenticazione e documentazione API.
+A modern boilerplate to quickly create a Node.js server with Express, TypeScript, Prisma, and PostgreSQL, complete with authentication and API documentation.
 
-## 📦 Installazione Rapida
+## 📦 Quick Installation
 
 ```bash
 npx create-express-auth my-app
@@ -10,112 +10,112 @@ cd my-app
 npm run dev
 ```
 
-## 🛠 Stack Tecnologico
+## 🛠 Tech Stack
 
-- **TypeScript** - Tipizzazione statica per JavaScript
-- **Express** - Framework web veloce e minimale
-- **Prisma** - ORM moderno per database
-- **PostgreSQL** - Database relazionale
-- **JWT** - Autenticazione basata su token
-- **Swagger** - Documentazione API
+- **TypeScript** - Static typing for JavaScript
+- **Express** - Fast, unopinionated web framework
+- **Prisma** - Modern database ORM
+- **PostgreSQL** - Relational database
+- **JWT** - Token-based authentication
+- **Swagger** - API documentation
 - **Winston** - Logging
 - **Jest** - Testing
 
-## 🗂 Struttura del Progetto
+## 🗂 Project Structure
 
 ```
 src/
-├── application/       # Logica di business
-├── domain/           # Entità e interfacce
-├── infrastructure/   # Implementazioni concrete
-│   ├── http/        # Server Express e middleware
-│   └── persistence/ # Repository e modelli Prisma
-└── utils/           # Utility condivise
+├── application/       # Business logic
+├── domain/           # Entities and interfaces
+├── infrastructure/   # Concrete implementations
+│   ├── http/        # Express server and middleware
+│   └── persistence/ # Repository and Prisma models
+└── utils/           # Shared utilities
 ```
 
-## 🚀 Come Iniziare
+## 🚀 Getting Started
 
-1. **Setup del Database**
+1. **Database Setup**
 
    ```bash
-   # Crea il file .env dalla copia di esempio
+   # Create .env file from example
    cp .env.example .env
 
-   # Configura il tuo database in .env
+   # Configure your database in .env
    DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 
-   # Esegui le migrazioni
+   # Run migrations
    npm run prisma:migrate
    ```
 
-2. **Avvia il Server**
+2. **Start the Server**
 
    ```bash
-   # Modalità sviluppo
+   # Development mode
    npm run dev
 
-   # Produzione
+   # Production
    npm run build
    npm start
    ```
 
-3. **Verifica l'Installazione**
+3. **Verify Installation**
    - Server: http://localhost:3000
-   - Documentazione API: http://localhost:3000/api-docs
+   - API Documentation: http://localhost:3000/api-docs
 
 ## 📝 API Endpoints
 
 ### Auth
 
-- `POST /api/auth/register` - Registrazione utente
-- `POST /api/auth/login` - Login utente
-- `GET /api/auth/me` - Profilo utente autenticato
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get authenticated user profile
 
 ### Users
 
-- `GET /api/users` - Lista utenti (admin)
-- `GET /api/users/:id` - Dettaglio utente
-- `PUT /api/users/:id` - Aggiorna utente
-- `DELETE /api/users/:id` - Elimina utente
+- `GET /api/users` - List users (admin)
+- `GET /api/users/:id` - Get user details
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
 
-## 🔒 Variabili d'Ambiente
+## 🔒 Environment Variables
 
 ```env
 PORT=3000
 NODE_ENV=development
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-JWT_SECRET="il-tuo-secret-super-sicuro"
+JWT_SECRET="your-super-secure-secret"
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Esegui tutti i test
+# Run all tests
 npm test
 
 # Coverage
 npm test -- --coverage
 ```
 
-## 📚 Best Practices Implementate
+## 📚 Implemented Best Practices
 
-- ✅ Architettura pulita (Clean Architecture)
+- ✅ Clean Architecture
 - ✅ Dependency Injection
-- ✅ Error Handling centralizzato
-- ✅ Validazione input con express-validator
-- ✅ Logging strutturato
-- ✅ Documentazione API con Swagger
-- ✅ Security best practices
-- ✅ Testing con Jest
+- ✅ Centralized Error Handling
+- ✅ Input validation with express-validator
+- ✅ Structured Logging
+- ✅ API Documentation with Swagger
+- ✅ Security Best Practices
+- ✅ Testing with Jest
 
 ## 🤝 Contributing
 
-Le pull request sono benvenute! Per modifiche importanti, apri prima un issue per discutere cosa vorresti cambiare.
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-## 📄 Licenza
+## 📄 License
 
 MIT
 
 ---
 
-Creato con ❤️ per velocizzare lo sviluppo di API robuste e sicure.
+Created with ❤️ to speed up the development of robust and secure APIs.
