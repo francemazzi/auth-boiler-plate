@@ -72,8 +72,8 @@ src/
 
 ## 🔗 Application URLs
 
-- **API Server**: http://localhost:3000
-- **API Documentation**: http://localhost:3000/api-docs
+- **API Server**: http://localhost:8080
+- **API Documentation**: http://localhost:8080/api-docs
 - **Email Testing UI**: http://localhost:8025
 
 ## 📝 API Endpoints
@@ -94,7 +94,7 @@ src/
 ## 🔒 Environment Variables
 
 ```env
-PORT=3000
+PORT=8080
 NODE_ENV=development
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 JWT_SECRET="your-super-secure-secret"
@@ -120,6 +120,7 @@ npm test -- --coverage
 - ✅ API Documentation with Swagger
 - ✅ Security Best Practices
 - ✅ Testing with Jest
+- [ ] Implement OTP Authentication
 
 ## 🤝 Contributing
 

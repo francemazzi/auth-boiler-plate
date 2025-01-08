@@ -5,8 +5,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/formit?schema=public
-      - JWT_SECRET=bobbylagotto6202
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/auth-boiler-plate?schema=public
+      - JWT_SECRET=change-this-secret-in-production
       - SMTP_HOST=mailhog
       - SMTP_PORT=1025
       - FRONTEND_URL=http://localhost:8080
@@ -30,7 +30,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=formit
+      - POSTGRES_DB=auth-boiler-plate
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
