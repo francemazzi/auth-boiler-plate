@@ -1,6 +1,6 @@
 {
   "name": "create-express-auth",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "description": "CLI to create an Express boilerplate with authentication, TypeScript, Prisma and PostgreSQL",
   "main": "src/infrastructure/http/server.ts",
   "bin": {

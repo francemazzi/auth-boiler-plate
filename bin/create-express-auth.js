@@ -79,7 +79,7 @@ try {
   );
 
   console.log(`${colors.bright}🐳 Docker Services:${colors.reset}`);
-  console.log(`${colors.bright}📊 PostgreSQL:${colors.reset} localhost:5432`);
+  console.log(`${colors.bright}📊 PostgreSQL:${colors.reset} localhost:5433`);
   console.log(
     `${colors.bright}📧 MailHog:${colors.reset} http://localhost:8025\n`
   );
