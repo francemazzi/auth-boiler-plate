@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { authRouter } from "./routes/auth.routes";
+import { otpRouter } from "./routes/otp.routes";
 import { swaggerSpec } from "./swagger";
 import path from "path";
 
@@ -33,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/auth", authRouter);
+app.use("/otp", otpRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Server Error:", err);

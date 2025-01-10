@@ -1,9 +1,10 @@
 /// <reference types="express" />
 
 declare namespace Express {
-  export interface Request {
+  interface Request {
     user?: {
       id: string;
+      email: string;
     };
   }
 }

@@ -97,6 +97,43 @@ src/
 - `POST /api/auth/login` - User login
 - `GET /api/auth/me` - Get authenticated user profile
 
+### Two-Factor Authentication (2FA)
+
+- `POST /otp/enable` - Enable 2FA for the user
+  - Returns a secret key and QR code for authenticator app setup
+  - Requires JWT authentication
+- `POST /otp/verify` - Verify an OTP token
+  - Requires JWT authentication and OTP token in request body
+- `POST /otp/disable` - Disable 2FA for the user
+  - Requires JWT authentication and valid OTP token to confirm
+
+#### Setting up 2FA
+
+1. **Enable 2FA**:
+
+   ```bash
+   curl -X POST http://localhost:8080/otp/enable \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
+   ```
+
+   Response includes:
+
+   - `secret`: Base32 secret key for manual setup
+   - `qrCode`: QR code image (base64) for scanning with authenticator app
+
+2. **Configure Authenticator App**:
+
+   - Scan the QR code with Google Authenticator or similar app
+   - Or manually enter the secret key
+
+3. **Verify Setup**:
+   ```bash
+   curl -X POST http://localhost:8080/otp/verify \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"token": "123456"}'  # 6-digit code from authenticator app
+   ```
+
 ### Users
 
 - `GET /api/users` - List users (admin)
@@ -133,7 +170,7 @@ npm test -- --coverage
 - ✅ API Documentation with Swagger
 - ✅ Security Best Practices
 - ✅ Testing with Jest
-- [ ] Implement OTP Authentication
+- ✅ Two-Factor Authentication (2FA) with TOTP
 
 ## 🤝 Contributing
 

@@ -13,6 +13,8 @@ model User {
   password  String
   name      String
   emailVerified Boolean   @default(false)
+  otpEnabled Boolean   @default(false)
+  otpSecret OTPSecret?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   licenses  License[]
@@ -25,6 +27,15 @@ model License {
   isActive  Boolean  @default(true)
   expiresAt DateTime
   userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OTPSecret {
+  id        String   @id @default(uuid())
+  secret    String
+  userId    String   @unique
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
