@@ -4,10 +4,19 @@ A modern boilerplate to quickly create a Node.js server with Express, TypeScript
 
 ## 📦 Quick Installation
 
+Create a new project using:
+
 ```bash
 npx create-express-auth my-app
 cd my-app
 ```
+
+This will:
+
+- Create a new directory with your project name
+- Set up all the necessary files and dependencies
+- Configure a basic authentication system
+- Set up Docker containers for PostgreSQL and MailHog
 
 ## 🛠 Tech Stack
 
@@ -35,45 +44,29 @@ src/
 
 ## 🚀 Getting Started
 
-1. **Project Setup**
+After running `npx create-express-auth my-app`, follow these steps:
+
+1. **Configure Environment**
 
    ```bash
-   # Create and configure your project
-   npx create-express-auth my-app
-   cd my-app
+   cp .env.example .env
+   # Edit .env with your settings
    ```
 
-2. **Configuration**
+2. **Start Services**
 
    ```bash
-   # Initialize configuration interactively
-   npm run config:init
-   ```
-
-   This will:
-
-   - Create a `config.toml` file with your settings
-   - Generate the `.env` file automatically
-   - Update `docker-compose.yml` with your configuration
-
-3. **Start Services**
-
-   ```bash
-   # Start PostgreSQL and MailHog
    docker-compose up -d
    ```
 
-4. **Database Setup**
+3. **Database Setup**
 
    ```bash
-   # Generate Prisma client
    npm run prisma:generate
-
-   # Create initial migration
    npx prisma migrate dev --name init
    ```
 
-5. **Start Development Server**
+4. **Start Development Server**
    ```bash
    npm run dev
    ```
@@ -93,9 +86,9 @@ src/
 
 ### Auth
 
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get authenticated user profile
+- `POST /auth/register` - User registration
+- `POST /auth/login` - User login
+- `GET /auth/me` - Get authenticated user profile
 
 ### Two-Factor Authentication (2FA)
 
