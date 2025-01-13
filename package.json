@@ -1,8 +1,8 @@
 {
   "name": "create-express-auth",
-  "version": "1.1.3",
+  "version": "1.1.7",
   "description": "Create a new Express.js project with authentication using: npx create-express-auth my-app",
-  "main": "src/infrastructure/http/server.ts",
+  "main": "./bin/block-install.js",
   "bin": {
     "create-express-auth": "./bin/create-express-auth.js"
   },
@@ -11,6 +11,9 @@
     "url": "https://github.com/francemazzi/auth-boiler-plate"
   },
   "scripts": {
+    "preinstall": "node ./bin/block-install.js",
+    "install": "node ./bin/block-install.js",
+    "postinstall": "node ./bin/block-install.js",
     "dev": "ts-node-dev --respawn --transpile-only src/infrastructure/http/server.ts",
     "build": "tsc",
     "start": "node dist/infrastructure/http/server.js",
@@ -19,6 +22,10 @@
     "test": "jest",
     "config:init": "node ./bin/init-config.js"
   },
+  "engines": {
+    "node": ">=14"
+  },
+  "preferGlobal": false,
   "keywords": [
     "express",
     "typescript",

@@ -2,6 +2,18 @@
 
 A modern boilerplate to quickly create a Node.js server with Express, TypeScript, Prisma, and PostgreSQL, complete with authentication and API documentation.
 
+## ⚠️ Important Note
+
+This package is meant to be used with `npx` to create new projects. Do not install it globally or as a dependency.
+
+```bash
+# ✅ Correct usage:
+npx create-express-auth my-app
+
+# ❌ Don't use:
+npm install create-express-auth  # This will not work
+```
+
 ## 📦 Quick Installation
 
 Create a new project using:
