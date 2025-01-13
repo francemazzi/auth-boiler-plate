@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+const path = require("path");
+
+// Verifica se siamo nella directory root del pacchetto
+const isInPackageRoot = process.cwd().endsWith("auth-boiler-plate");
+
 const isInstall = process.env.npm_config_argv
   ? JSON.parse(process.env.npm_config_argv).original[0] === "install"
   : process.env.npm_command === "install";
@@ -10,7 +15,8 @@ const isDirectInstall = process.env.npm_config_argv
     )
   : process.env.npm_package_name === "create-express-auth";
 
-if (isInstall && isDirectInstall) {
+// Blocca solo se siamo nella directory root del pacchetto
+if (isInstall && isDirectInstall && isInPackageRoot) {
   console.error(`
 \x1b[31m=====================================================\x1b[0m
 \x1b[1m❌ ERROR: Direct installation not supported

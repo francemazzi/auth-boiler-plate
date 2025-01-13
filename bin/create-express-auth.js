@@ -49,6 +49,21 @@ try {
     recursive: true,
     force: true,
   });
+  fs.rmSync(path.join(process.cwd(), projectName, "bin", "block-install.js"), {
+    force: true,
+  });
+
+  const packageJsonPath = path.join(process.cwd(), projectName, "package.json");
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+
+  delete packageJson.scripts.preinstall;
+  delete packageJson.scripts.install;
+  delete packageJson.scripts.postinstall;
+
+  packageJson.main = "./src/infrastructure/http/server.ts";
+
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
   console.log(`${colors.green}✓${colors.reset} Repository cleaned`);
 
   console.log(`\n${colors.bright}📥 Installing dependencies...${colors.reset}`);
