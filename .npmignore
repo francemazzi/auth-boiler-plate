@@ -63,13 +63,6 @@ tsconfig.tsbuildinfo
 CONTRIBUTING.md
 CHANGELOG.md
 
-# Source code
-src/
-tests/
-__tests__/
-*.test.*
-*.spec.*
-
 # Documentation
 docs/
 *.md
@@ -95,3 +88,5 @@ yarn-error.log*
 *.db
 prisma/*.db
 prisma/migrations/ 
+
+.github/workflows
