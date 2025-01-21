@@ -13,6 +13,31 @@ const colors = {
   red: "\x1b[31m",
 };
 
+function updateDependencies(packageJson) {
+  const dependencies = packageJson.dependencies || {};
+  const devDependencies = packageJson.devDependencies || {};
+
+  for (const [key, value] of Object.entries(dependencies)) {
+    dependencies[key] = value.replace(/[\^~]/, "");
+  }
+  for (const [key, value] of Object.entries(devDependencies)) {
+    devDependencies[key] = value.replace(/[\^~]/, "");
+  }
+
+  return { ...packageJson, dependencies, devDependencies };
+}
+
+function validateProjectName(name) {
+  if (!/^[a-zA-Z0-9-_]+$/.test(name)) {
+    throw new Error(
+      "Project name can only contain letters, numbers, hyphens and underscores"
+    );
+  }
+  if (fs.existsSync(name)) {
+    throw new Error(`Directory ${name} already exists`);
+  }
+}
+
 const projectName = process.argv[2];
 
 if (!projectName) {
@@ -31,6 +56,8 @@ if (!projectName) {
 }
 
 try {
+  validateProjectName(projectName);
+
   console.log(`\n${colors.bright}🚀 Initializing project...${colors.reset}\n`);
 
   fs.mkdirSync(projectName);
@@ -54,13 +81,17 @@ try {
   });
 
   const packageJsonPath = path.join(process.cwd(), projectName, "package.json");
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  let packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
   delete packageJson.scripts.preinstall;
   delete packageJson.scripts.install;
   delete packageJson.scripts.postinstall;
 
   packageJson.main = "./src/infrastructure/http/server.ts";
+  packageJson.name = projectName;
+  packageJson.version = "1.0.0";
+
+  packageJson = updateDependencies(packageJson);
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 

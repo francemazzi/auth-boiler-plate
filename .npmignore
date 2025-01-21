@@ -1,19 +1,57 @@
-.git
-.gitignore
-node_modules
-npm-debug.log
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+*.test.ts
+*.spec.ts
+jest.config.js
+
+# Build
+dist/
+build/
+
+# Environment
 .env
-.env.example
-.DS_Store
-coverage
-.vscode
-.idea
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
 *.log
-dist
+npm-debug.log*
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Docker
 docker-compose.yml
 Dockerfile
-tests/
-docs/
-.github/
-*.test.ts
-*.spec.ts 
+.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Prisma
+prisma/migrations/
+*.db
+*.sqlite
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# Development files
+*.md
+!README.md
+CONTRIBUTING.md
+CHANGELOG.md 

@@ -23,8 +23,9 @@ services:
              npm run prisma:migrate &&
              npm run dev"
 
-  db:
-    image: postgres:14-alpine
+  postgres:
+    image: postgres:latest
+    container_name: postgres
     ports:
       - "5433:5432"
     environment:
@@ -33,11 +34,25 @@ services:
       - POSTGRES_DB=auth-boiler-plate
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongodb_data:/data/db
 
   mailhog:
     image: jcalonso/mailhog:latest
