@@ -13,12 +13,55 @@
 
 A modern boilerplate to quickly create a Node.js server with Express, TypeScript, Prisma, and PostgreSQL, complete with authentication and API documentation.
 
-[Documentazione](#-documentazione) •
+[Documentation](#-documentation) •
 [Quick Start](#-quick-start) •
-[Caratteristiche](#-caratteristiche) •
-[Architettura](#-architettura)
+[Features](#-features) •
+[Architecture](#-architecture)
 
 </div>
+
+## ✨ Features
+
+- 🔐 **Complete Authentication**
+
+  - JWT Authentication
+  - Two-Factor Authentication (2FA/TOTP)
+  - Password Reset
+  - Email Verification
+
+- 🏗 **Robust Architecture**
+
+  - Clean Architecture
+  - Dependency Injection
+  - Repository Pattern
+  - SOLID Principles
+
+- 🛡 **Security**
+
+  - Rate Limiting
+  - CORS Configuration
+  - Helmet Security Headers
+  - Input Validation
+  - Password Hashing
+
+- 📊 **Database & ORM**
+
+  - PostgreSQL
+  - Prisma ORM
+  - Migrations
+  - Seeding
+
+- 🧪 **Testing & Quality**
+
+  - Jest & Supertest
+  - Coverage Reports
+  - ESLint & Prettier
+  - Husky Hooks
+
+- 📚 **Documentation**
+  - Swagger/OpenAPI
+  - Postman Collection
+  - JSDoc Comments
 
 ## 🚀 Quick Start
 
@@ -27,42 +70,29 @@ npx create-express-auth my-app
 cd my-app
 ```
 
-This will:
-
-- Create a new directory with your project name
-- Set up all the necessary files and dependencies
-- Configure a basic authentication system
-- Set up Docker containers for PostgreSQL and MailHog
-
-## 🛠 Tech Stack
-
-- **TypeScript** - Static typing for JavaScript
-- **Express** - Fast, unopinionated web framework
-- **Prisma** - Modern database ORM
-- **PostgreSQL** - Relational database
-- **JWT** - Token-based authentication
-- **Swagger** - API documentation
-- **Winston** - Logging
-- **Jest** - Testing
-- **Docker** - Containerization for PostgreSQL and MailHog
-
-## 🗂 Project Structure
+## 🏗 Architecture
 
 ```
 src/
-├── application/       # Business logic
-├── domain/           # Entities and interfaces
-├── infrastructure/   # Concrete implementations
-│   ├── http/        # Express server and middleware
-│   └── persistence/ # Repository and Prisma models
-└── utils/           # Shared utilities
+├── application/          # Business Logic
+│   ├── use-cases/       # Application Use Cases
+│   └── interfaces/      # Repository Interfaces
+│
+├── domain/              # Domain Logic
+│   ├── entities/        # Domain Models
+│   └── value-objects/   # Value Objects
+│
+├── infrastructure/      # Concrete Implementations
+│   ├── http/           # Express Server & Middleware
+│   ├── persistence/    # Repository & Prisma Models
+│   └── services/       # External Services (email, cache, etc.)
+│
+└── utils/              # Shared Utilities
 ```
 
-## 🚀 Getting Started
+## 🚀 Setup & Configuration
 
-After running `npx create-express-auth my-app`, follow these steps:
-
-1. **Configure Environment**
+1. **Environment Setup**
 
    ```bash
    cp .env.example .env
@@ -79,99 +109,86 @@ After running `npx create-express-auth my-app`, follow these steps:
 
    ```bash
    npm run prisma:generate
-   npx prisma migrate dev --name init
+   npx prisma migrate dev
    ```
 
-4. **Start Development Server**
+4. **Start Server**
    ```bash
    npm run dev
    ```
 
-## 🐳 Docker Services
-
-- **PostgreSQL**: Running on `localhost:5432`
-- **MailHog** (Email Testing): Available at `http://localhost:8025`
-
-## 🔗 Application URLs
+## 🔗 Service URLs
 
 - **API Server**: http://localhost:8080
 - **API Documentation**: http://localhost:8080/api-docs
 - **Email Testing UI**: http://localhost:8025
 
-## 📝 API Endpoints
+## 📝 API Documentation
 
-### Auth
+### Authentication
 
-- `POST /auth/register` - User registration
-- `POST /auth/login` - User login
-- `GET /auth/me` - Get authenticated user profile
+```http
+POST /auth/register     # User registration
+POST /auth/login       # User login
+GET  /auth/me          # Get authenticated user profile
+POST /auth/refresh     # Refresh token
+POST /auth/logout      # User logout
+```
+
+### User Management
+
+```http
+GET    /api/users      # List users (admin)
+GET    /api/users/:id  # Get user details
+PUT    /api/users/:id  # Update user
+DELETE /api/users/:id  # Delete user
+```
 
 ### Two-Factor Authentication (2FA)
 
-- `POST /otp/enable` - Enable 2FA for the user
-  - Returns a secret key and QR code for authenticator app setup
-  - Requires JWT authentication
-- `POST /otp/verify` - Verify an OTP token
-  - Requires JWT authentication and OTP token in request body
-- `POST /otp/disable` - Disable 2FA for the user
-  - Requires JWT authentication and valid OTP token to confirm
+```http
+POST /otp/enable       # Enable 2FA
+POST /otp/verify       # Verify OTP token
+POST /otp/disable      # Disable 2FA
+```
 
-#### Setting up 2FA
-
-1. **Enable 2FA**:
-
-   ```bash
-   curl -X POST http://localhost:8080/otp/enable \
-     -H "Authorization: Bearer YOUR_JWT_TOKEN"
-   ```
-
-   Response includes:
-
-   - `secret`: Base32 secret key for manual setup
-   - `qrCode`: QR code image (base64) for scanning with authenticator app
-
-2. **Configure Authenticator App**:
-
-   - Scan the QR code with Google Authenticator or similar app
-   - Or manually enter the secret key
-
-3. **Verify Setup**:
-   ```bash
-   curl -X POST http://localhost:8080/otp/verify \
-     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{"token": "123456"}'  # 6-digit code from authenticator app
-   ```
-
-### Users
-
-- `GET /api/users` - List users (admin)
-- `GET /api/users/:id` - Get user details
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
-
-## 🔒 Environment Variables
+## 🔧 Environment Variables
 
 ```env
+# Server
 PORT=8080
 NODE_ENV=development
+
+# Database
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+
+# Authentication
 JWT_SECRET="your-super-secure-secret"
+JWT_REFRESH_SECRET="your-refresh-secret"
+JWT_EXPIRES_IN="1h"
+
+# Email
+SMTP_HOST="smtp.example.com"
+SMTP_PORT=587
+SMTP_USER="your-email@example.com"
+SMTP_PASS="your-smtp-password"
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Run all tests
-npm test
+# Unit Tests
+npm run test
+
+# E2E Tests
+npm run test:e2e
 
 # Coverage
-npm test -- --coverage
+npm run test:coverage
 ```
 
 ## 📈 Roadmap
 
-- [ ] Testing with Supertest
 - [ ] GraphQL Support
 - [ ] Redis Caching
 - [ ] OAuth Integration
@@ -194,6 +211,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 <div align="center">
 Made with ❤️ to speed up the development of robust and secure APIs.
 
-[![Stargazers](https://img.shields.io/github/stars/yourusername/express-auth-boilerplate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
+[![Stargazers](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
 </div>
