@@ -1,22 +1,26 @@
-# Express Auth Boilerplate 🚀
+# Express Auth Boilerplate
+
+<div align="center">
+
+![Express Auth Banner](https://user-images.githubusercontent.com/YOUR_USERNAME/express-auth-banner.png)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
+[![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 A modern boilerplate to quickly create a Node.js server with Express, TypeScript, Prisma, and PostgreSQL, complete with authentication and API documentation.
 
-## ⚠️ Important Note
+[Documentazione](#-documentazione) •
+[Quick Start](#-quick-start) •
+[Caratteristiche](#-caratteristiche) •
+[Architettura](#-architettura)
 
-This package is meant to be used with `npx` to create new projects. Do not install it globally or as a dependency.
+</div>
 
-```bash
-# ✅ Correct usage:
-npx create-express-auth my-app
-
-# ❌ Don't use:
-npm install create-express-auth  # This will not work
-```
-
-## 📦 Quick Installation
-
-Create a new project using:
+## 🚀 Quick Start
 
 ```bash
 npx create-express-auth my-app
@@ -165,17 +169,15 @@ npm test
 npm test -- --coverage
 ```
 
-## 📚 Implemented Best Practices
+## 📈 Roadmap
 
-- ✅ Clean Architecture
-- ✅ Dependency Injection
-- ✅ Centralized Error Handling
-- ✅ Input validation with express-validator
-- ✅ Structured Logging
-- ✅ API Documentation with Swagger
-- ✅ Security Best Practices
-- ✅ Testing with Jest
-- ✅ Two-Factor Authentication (2FA) with TOTP
+- [ ] Testing with Supertest
+- [ ] GraphQL Support
+- [ ] Redis Caching
+- [ ] OAuth Integration
+- [ ] WebSocket Support
+- [ ] Microservices Architecture
+- [ ] Kubernetes Configuration
 
 ## 🤝 Contributing
 
@@ -183,8 +185,15 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## 📄 License
 
-MIT
+MIT License • Copyright (c) 2024 Francesco
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for full details.
 
 ---
 
-Created with ❤️ to speed up the development of robust and secure APIs.
+<div align="center">
+Made with ❤️ to speed up the development of robust and secure APIs.
+
+[![Stargazers](https://img.shields.io/github/stars/yourusername/express-auth-boilerplate?style=social)](https://github.com/yourusername/express-auth-boilerplate/stargazers)
+
+</div>

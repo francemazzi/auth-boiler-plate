@@ -1,6 +1,6 @@
 {
   "name": "create-express-auth",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Create a new Express.js project with authentication using: npx create-express-auth my-app",
   "main": "./bin/block-install.js",
   "bin": {
