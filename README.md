@@ -194,6 +194,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 <div align="center">
 Made with ❤️ to speed up the development of robust and secure APIs.
 
-[![Stargazers](https://img.shields.io/github/stars/yourusername/express-auth-boilerplate?style=social)](https://github.com/yourusername/express-auth-boilerplate/stargazers)
+[![Stargazers](https://img.shields.io/github/stars/yourusername/express-auth-boilerplate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
 </div>
