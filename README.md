@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Express Auth Banner](https://user-images.githubusercontent.com/YOUR_USERNAME/express-auth-banner.png)
+![Express Auth Banner](express.auth.jpg)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
