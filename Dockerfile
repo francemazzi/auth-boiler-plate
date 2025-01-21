@@ -1,25 +1,25 @@
-FROM node:18-bullseye-slim
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && \
-    apt-get install -y openssl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+# Copy package files
 COPY package*.json ./
-COPY tsconfig.json ./
 COPY prisma ./prisma/
 
-RUN npm install
+# Install dependencies
+RUN npm ci
 
-RUN npm run prisma:generate
-
+# Copy source code
 COPY . .
 
-RUN mkdir -p /usr/src/app/dist/infrastructure/http/public && \
-    cp -r /usr/src/app/src/infrastructure/http/public/* /usr/src/app/dist/infrastructure/http/public/
+# Generate Prisma Client
+RUN npm run prisma:generate
 
+# Build TypeScript
+RUN npm run build
+
+# Expose port
 EXPOSE 8080
 
-CMD ["npm", "run", "dev"] 
+# Start the application
+CMD ["npm", "start"] 
