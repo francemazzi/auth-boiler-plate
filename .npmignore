@@ -16,7 +16,12 @@ build/
 # Environment
 .env
 .env.*
-!.env.example
+*.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
 
 # IDE
 .idea/
@@ -28,6 +33,8 @@ build/
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # System Files
 .DS_Store
@@ -54,4 +61,37 @@ tsconfig.tsbuildinfo
 *.md
 !README.md
 CONTRIBUTING.md
-CHANGELOG.md 
+CHANGELOG.md
+
+# Source code
+src/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Build and debug
+.nyc_output/
+*.debug
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.sqlite
+*.db
+prisma/*.db
+prisma/migrations/ 
