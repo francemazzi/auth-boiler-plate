@@ -1,13 +1,13 @@
-import { Request, Response } from "express";
-import { RegisterUseCase } from "../../../application/use-cases/auth/RegisterUseCase";
-import { LoginUseCase } from "../../../application/use-cases/auth/LoginUseCase";
-import { VerifyEmailUseCase } from "../../../application/use-cases/auth/VerifyEmailUseCase";
+import { Request, Response } from 'express';
+import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase';
+import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase';
+import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase';
 
 export class AuthController {
   constructor(
-    private registerUseCase: RegisterUseCase,
-    private loginUseCase: LoginUseCase,
-    private verifyEmailUseCase: VerifyEmailUseCase
+    private readonly registerUseCase: RegisterUseCase,
+    private readonly loginUseCase: LoginUseCase,
+    private readonly verifyEmailUseCase: VerifyEmailUseCase,
   ) {}
 
   async register(request: Request, response: Response): Promise<Response> {
@@ -20,10 +20,13 @@ export class AuthController {
         name,
       });
 
-      return response.status(201).json(user);
+      return response.status(201).json({
+        user,
+        message: 'User registered successfully',
+      });
     } catch (error) {
       return response.status(400).json({
-        message: error instanceof Error ? error.message : "Unexpected error",
+        message: error instanceof Error ? error.message : 'Registration failed',
       });
     }
   }
@@ -37,10 +40,10 @@ export class AuthController {
         password,
       });
 
-      return response.json(result);
+      return response.status(200).json(result);
     } catch (error) {
-      return response.status(400).json({
-        message: error instanceof Error ? error.message : "Unexpected error",
+      return response.status(401).json({
+        message: error instanceof Error ? error.message : 'Authentication failed',
       });
     }
   }
@@ -50,13 +53,15 @@ export class AuthController {
 
     try {
       await this.verifyEmailUseCase.execute({
-        token: String(token),
+        token: token as string,
       });
 
-      return response.json({ message: "Email verificata con successo" });
+      return response.status(200).json({
+        message: 'Email verified successfully',
+      });
     } catch (error) {
       return response.status(400).json({
-        message: error instanceof Error ? error.message : "Unexpected error",
+        message: error instanceof Error ? error.message : 'Email verification failed',
       });
     }
   }

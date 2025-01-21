@@ -104,7 +104,7 @@ src/
    npm run prisma:generate
 
    # Run migrations
-   npx prisma migrate dev
+   npx prisma migrate dev --name <name>
 
    # Seed the database with initial data
    npm run seed

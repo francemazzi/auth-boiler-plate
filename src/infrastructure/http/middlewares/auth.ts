@@ -1,28 +1,27 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-export const authenticateToken = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+interface JwtPayload {
+  id: string;
+  email: string;
+}
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Token di autenticazione mancante" });
-  }
-
+export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
-      email: string;
-    };
-    req.user = { id: decoded.userId };
-    next();
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const [bearer, token] = authHeader.split(' ');
+    if (bearer !== 'Bearer' || !token) {
+      return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as JwtPayload;
+    req.user = { id: decoded.id };
+    return next();
   } catch (error) {
-    return res.status(403).json({ message: "Token non valido" });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };

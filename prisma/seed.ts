@@ -4,12 +4,10 @@ import { hash } from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clean the database
   await prisma.user.deleteMany();
 
   console.log('Seeding database...');
 
-  // Create admin user
   const adminPassword = await hash('admin123', 8);
   const admin = await prisma.user.create({
     data: {
@@ -21,7 +19,6 @@ async function main() {
   });
   console.log('Created admin user:', admin.email);
 
-  // Create regular users
   const userPassword = await hash('user123', 8);
   const users = await Promise.all(
     Array.from({ length: 5 }).map(async (_, i) => {

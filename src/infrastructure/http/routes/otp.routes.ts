@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { OTPController } from "../controllers/OTPController";
-import { PrismaClient } from "@prisma/client";
-import { OTPService } from "../../services/OTPService";
-import { EnableOTPUseCase } from "../../../application/use-cases/otp/EnableOTPUseCase";
-import { VerifyOTPUseCase } from "../../../application/use-cases/otp/VerifyOTPUseCase";
-import { DisableOTPUseCase } from "../../../application/use-cases/otp/DisableOTPUseCase";
-import { authenticateToken } from "../middlewares/auth";
+import { Router } from 'express';
+import { OTPController } from '../controllers/OTPController';
+import { PrismaClient } from '@prisma/client';
+import { OTPService } from '../../services/OTPService';
+import { EnableOTPUseCase } from '../../../application/use-cases/otp/EnableOTPUseCase';
+import { VerifyOTPUseCase } from '../../../application/use-cases/otp/VerifyOTPUseCase';
+import { DisableOTPUseCase } from '../../../application/use-cases/otp/DisableOTPUseCase';
+import { authenticate } from '../middlewares/auth';
 
 export const otpRouter = Router();
 const prisma = new PrismaClient();
@@ -15,13 +15,9 @@ const enableOTPUseCase = new EnableOTPUseCase(prisma, otpService);
 const verifyOTPUseCase = new VerifyOTPUseCase(prisma, otpService);
 const disableOTPUseCase = new DisableOTPUseCase(prisma, otpService);
 
-const otpController = new OTPController(
-  enableOTPUseCase,
-  verifyOTPUseCase,
-  disableOTPUseCase
-);
+const otpController = new OTPController(enableOTPUseCase, verifyOTPUseCase, disableOTPUseCase);
 
-otpRouter.use(authenticateToken);
+otpRouter.use(authenticate);
 
 /**
  * @swagger
@@ -50,7 +46,7 @@ otpRouter.use(authenticateToken);
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post("/enable", (req, res) => otpController.enable(req, res));
+otpRouter.post('/enable', (req, res) => otpController.enable(req, res));
 
 /**
  * @swagger
@@ -88,7 +84,7 @@ otpRouter.post("/enable", (req, res) => otpController.enable(req, res));
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post("/verify", (req, res) => otpController.verify(req, res));
+otpRouter.post('/verify', (req, res) => otpController.verify(req, res));
 
 /**
  * @swagger
@@ -118,4 +114,4 @@ otpRouter.post("/verify", (req, res) => otpController.verify(req, res));
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post("/disable", (req, res) => otpController.disable(req, res));
+otpRouter.post('/disable', (req, res) => otpController.disable(req, res));

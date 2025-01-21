@@ -1,52 +1,67 @@
-import "dotenv/config";
-import express, { Request, Response, NextFunction } from "express";
-import cors from "cors";
-import swaggerUi from "swagger-ui-express";
-import { authRouter } from "./routes/auth.routes";
-import { otpRouter } from "./routes/otp.routes";
-import { swaggerSpec } from "./swagger";
-import path from "path";
+import 'dotenv/config';
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import { router } from './routes';
+import { errorHandler } from './middlewares/error';
+import { rateLimiter } from './middlewares/rateLimiter';
+import path from 'path';
 
 const app = express();
+const port = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
+app.use(rateLimiter);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, _res: Response, next: NextFunction) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
+  return next();
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof SyntaxError && "body" in err) {
-    console.error("JSON Parse Error:", err.message);
-    return res.status(400).json({ message: "Invalid JSON" });
+app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof SyntaxError && 'body' in err) {
+    console.error('JSON Parse Error:', err.message);
+    return res.status(400).json({ message: 'Invalid JSON' });
   }
-  next(err);
+  return next(err);
 });
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+app.get('/', (_: Request, res: Response) => {
+  return res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-app.use("/auth", authRouter);
-app.use("/otp", otpRouter);
-
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Server Error:", err);
-  res.status(500).json({ message: "Internal server error" });
+app.get('/health', (_req: Request, res: Response) => {
+  return res.json({ status: 'ok' });
 });
 
-const PORT = process.env.PORT || 8080;
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Express Auth API',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./src/infrastructure/http/routes/*.ts'],
+});
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', (_req: Request, res: Response) => {
+  return res.send(swaggerUi.generateHTML(swaggerSpec));
+});
+
+app.use('/api', router);
+
+app.use(errorHandler);
+
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
   console.log(`Database URL: ${process.env.DATABASE_URL}`);
   console.log(`SMTP Host: ${process.env.SMTP_HOST}`);
   console.log(`SMTP Port: ${process.env.SMTP_PORT}`);
-  console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
+  console.log(`Swagger UI available at http://localhost:${port}/api-docs`);
 });
