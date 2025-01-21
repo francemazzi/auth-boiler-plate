@@ -26,13 +26,11 @@ A modern boilerplate to quickly create a Node.js server with Express, TypeScript
 
   - JWT Authentication
   - Two-Factor Authentication (2FA/TOTP)
-  - Password Reset
   - Email Verification
 
 - 🏗 **Robust Architecture**
 
   - Clean Architecture
-  - Dependency Injection
   - Repository Pattern
   - SOLID Principles
 
@@ -40,27 +38,21 @@ A modern boilerplate to quickly create a Node.js server with Express, TypeScript
 
   - Rate Limiting
   - CORS Configuration
-  - Helmet Security Headers
-  - Input Validation
   - Password Hashing
 
 - 📊 **Database & ORM**
 
   - PostgreSQL
   - Prisma ORM
-  - Migrations
-  - Seeding
 
 - 🧪 **Testing & Quality**
 
-  - Jest & Supertest
   - Coverage Reports
   - ESLint & Prettier
   - Husky Hooks
 
 - 📚 **Documentation**
   - Swagger/OpenAPI
-  - Postman Collection
   - JSDoc Comments
 
 ## 🚀 Quick Start
@@ -108,9 +100,20 @@ src/
 3. **Database Setup**
 
    ```bash
+   # Generate Prisma Client
    npm run prisma:generate
+
+   # Run migrations
    npx prisma migrate dev
+
+   # Seed the database with initial data
+   npm run seed
    ```
+
+   Default seeded accounts:
+
+   - Admin: admin@example.com / admin123
+   - Users: user1@example.com through user5@example.com / user123
 
 4. **Start Server**
    ```bash
@@ -189,9 +192,9 @@ npm run test:coverage
 
 ## 📈 Roadmap
 
-- [ ] GraphQL Support
+- [ ] Password Reset
+- [ ] Jest & Supertest testing
 - [ ] Redis Caching
-- [ ] OAuth Integration
 - [ ] WebSocket Support
 - [ ] Microservices Architecture
 - [ ] Kubernetes Configuration
