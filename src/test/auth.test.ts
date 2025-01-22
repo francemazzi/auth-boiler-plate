@@ -72,6 +72,78 @@ describe('AuthController', () => {
         message: 'User registered successfully',
       });
     });
+
+    it('should handle registration error', async () => {
+      const mockUser = {
+        email: 'test@example.com',
+        password: 'Password123!',
+        name: 'Test User',
+      };
+
+      mockRequest = {
+        body: mockUser,
+      };
+
+      const error = new Error('Email already exists');
+      jest.spyOn(registerUseCase, 'execute').mockRejectedValue(error);
+
+      await authController.register(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Email already exists',
+      });
+    });
+  });
+
+  describe('login', () => {
+    it('should login user successfully', async () => {
+      const mockCredentials = {
+        email: 'test@example.com',
+        password: 'Password123!',
+      };
+
+      mockRequest = {
+        body: mockCredentials,
+      };
+
+      const mockLoginResult = {
+        token: 'jwt-token',
+        user: {
+          id: '1',
+          email: mockCredentials.email,
+          name: 'Test User',
+        },
+      };
+
+      jest.spyOn(loginUseCase, 'execute').mockResolvedValue(mockLoginResult);
+
+      await authController.login(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(mockLoginResult);
+    });
+
+    it('should handle invalid credentials', async () => {
+      const mockCredentials = {
+        email: 'test@example.com',
+        password: 'WrongPassword',
+      };
+
+      mockRequest = {
+        body: mockCredentials,
+      };
+
+      const error = new Error('Invalid credentials');
+      jest.spyOn(loginUseCase, 'execute').mockRejectedValue(error);
+
+      await authController.login(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Invalid credentials',
+      });
+    });
   });
 
   describe('verifyEmail', () => {
@@ -89,6 +161,24 @@ describe('AuthController', () => {
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Email verified successfully',
+      });
+    });
+
+    it('should handle invalid verification token', async () => {
+      const mockToken = 'invalid-token';
+
+      mockRequest = {
+        query: { token: mockToken },
+      };
+
+      const error = new Error('Invalid verification token');
+      jest.spyOn(verifyEmailUseCase, 'execute').mockRejectedValue(error);
+
+      await authController.verifyEmail(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Invalid verification token',
       });
     });
   });
