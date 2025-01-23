@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase';
 import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase';
 import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase';
+import { AppError } from '../../../domain/errors/AppError';
 
 export class AuthController {
   constructor(
@@ -13,6 +14,10 @@ export class AuthController {
   async register(request: Request, response: Response): Promise<Response> {
     const { email, password, name } = request.body;
 
+    if (!email || !password || !name) {
+      throw AppError.badRequest('Missing required fields', 'MISSING_FIELDS');
+    }
+
     try {
       const user = await this.registerUseCase.execute({
         email,
@@ -21,18 +26,26 @@ export class AuthController {
       });
 
       return response.status(201).json({
-        user,
-        message: 'User registered successfully',
+        status: 'success',
+        data: {
+          user,
+          message: 'User registered successfully',
+        },
       });
     } catch (error) {
-      return response.status(400).json({
-        message: error instanceof Error ? error.message : 'Registration failed',
-      });
+      if (error.message.includes('already exists')) {
+        throw AppError.conflict(error.message, 'USER_EXISTS');
+      }
+      throw AppError.internal('Registration failed');
     }
   }
 
   async login(request: Request, response: Response): Promise<Response> {
     const { email, password } = request.body;
+
+    if (!email || !password) {
+      throw AppError.badRequest('Email and password are required', 'MISSING_CREDENTIALS');
+    }
 
     try {
       const result = await this.loginUseCase.execute({
@@ -40,16 +53,21 @@ export class AuthController {
         password,
       });
 
-      return response.status(200).json(result);
-    } catch (error) {
-      return response.status(401).json({
-        message: error instanceof Error ? error.message : 'Authentication failed',
+      return response.status(200).json({
+        status: 'success',
+        data: result,
       });
+    } catch (error) {
+      throw AppError.unauthorized(error.message, 'INVALID_CREDENTIALS');
     }
   }
 
   async verifyEmail(request: Request, response: Response): Promise<Response> {
     const { token } = request.query;
+
+    if (!token) {
+      throw AppError.badRequest('Token is required', 'MISSING_TOKEN');
+    }
 
     try {
       await this.verifyEmailUseCase.execute({
@@ -57,12 +75,11 @@ export class AuthController {
       });
 
       return response.status(200).json({
+        status: 'success',
         message: 'Email verified successfully',
       });
     } catch (error) {
-      return response.status(400).json({
-        message: error instanceof Error ? error.message : 'Email verification failed',
-      });
+      throw AppError.badRequest(error.message, 'INVALID_TOKEN');
     }
   }
 }
