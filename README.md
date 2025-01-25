@@ -1,4 +1,4 @@
-# Express Auth Boilerplate
+# Express Auth Boilerplate 🚀
 
 <div align="center">
 
@@ -11,209 +11,178 @@
 [![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-A modern boilerplate to quickly create a Node.js server with Express, TypeScript, Prisma, and PostgreSQL, complete with authentication and API documentation.
+A modern, production-ready authentication boilerplate built with TypeScript, Express, and Prisma. Features clean architecture, comprehensive testing, and Docker support out of the box.
 
-[Documentation](#-documentation) •
-[Quick Start](#-quick-start) •
 [Features](#-features) •
-[Architecture](#-architecture)
+[Quick Start](#-quick-start) •
+[Architecture](#-architecture) •
+[Documentation](#-documentation)
 
 </div>
 
 ## ✨ Features
 
-- 🔐 **Complete Authentication**
+- 🔐 **Enterprise-Grade Authentication**
 
-  - JWT Authentication
-  - Two-Factor Authentication (2FA/TOTP)
+  - JWT-based Authentication
+  - Two-Factor Authentication (TOTP)
   - Email Verification
-
-- 🏗 **Robust Architecture**
-
-  - Clean Architecture
-  - Repository Pattern
-  - SOLID Principles
-
-- 🛡 **Security**
-
   - Rate Limiting
-  - CORS Configuration
+
+- 🏗 **Clean Architecture**
+
+  - Domain-Driven Design
+  - SOLID Principles
+  - Repository Pattern
+  - Use Case Pattern
+
+- 🛡 **Security First**
+
+  - Request Rate Limiting
+  - CORS Protection
   - Password Hashing
-
-- 📊 **Database & ORM**
-
-  - PostgreSQL
-  - Prisma ORM
+  - JWT Token Management
 
 - 🧪 **Testing & Quality**
 
-  - Coverage Reports
+  - Jest Unit Tests
+  - Error Handling
+  - Code Coverage
   - ESLint & Prettier
-  - Husky Hooks
 
-- 📚 **Documentation**
-  - Swagger/OpenAPI
-  - JSDoc Comments
+- 🐳 **Docker Ready**
+
+  - Multi-container setup
+  - PostgreSQL
+  - MailHog for email testing
+  - Production-ready configuration
+
+- 📚 **API Documentation**
+  - OpenAPI/Swagger
+  - Detailed error codes
+  - Comprehensive examples
 
 ## 🚀 Quick Start
 
 ```bash
+# Create a new project
 npx create-express-auth my-app
+
+# Navigate to project
 cd my-app
+
+# Start services with Docker
+docker-compose up -d
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start development server
+npm run dev
 ```
 
-## 🏗 Architecture
+## 🏗 Project Structure
 
 ```
 src/
-├── application/          # Business Logic
-│   ├── use-cases/       # Application Use Cases
-│   └── interfaces/      # Repository Interfaces
+├── application/          # Application business logic
+│   └── use-cases/       # Use cases implementation
 │
-├── domain/              # Domain Logic
-│   ├── entities/        # Domain Models
-│   └── value-objects/   # Value Objects
+├── domain/              # Domain layer
+│   ├── entities/        # Domain entities
+│   ├── repositories/    # Repository interfaces
+│   └── errors/         # Custom error classes
 │
-├── infrastructure/      # Concrete Implementations
-│   ├── http/           # Express Server & Middleware
-│   ├── persistence/    # Repository & Prisma Models
-│   └── services/       # External Services (email, cache, etc.)
+├── infrastructure/      # External interfaces
+│   ├── http/           # Express configuration
+│   │   ├── controllers/
+│   │   ├── middlewares/
+│   │   └── routes/
+│   └── services/       # External services
 │
-└── utils/              # Shared Utilities
+└── test/               # Test files
 ```
 
-## 🚀 Setup & Configuration
+## 🔧 Environment Setup
 
-1. **Environment Setup**
+1. **Clone and Install**
+
+   ```bash
+   git clone <repository-url>
+   cd <project-name>
+   npm install
+   ```
+
+2. **Environment Variables**
 
    ```bash
    cp .env.example .env
    # Edit .env with your settings
    ```
 
-2. **Start Services**
-
-   ```bash
-   docker-compose up -d
-   ```
-
 3. **Database Setup**
 
    ```bash
+   # Start PostgreSQL
+   docker-compose up -d postgres
+
    # Generate Prisma Client
    npm run prisma:generate
 
    # Run migrations
-   npx prisma migrate dev --name <name>
-
-   # Seed the database with initial data
-   npm run seed
+   npx prisma migrate dev
    ```
-
-   Default seeded accounts:
-
-   - Admin: admin@example.com / admin123
-   - Users: user1@example.com through user5@example.com / user123
-
-4. **Start Server**
-   ```bash
-   npm run dev
-   ```
-
-## 🔗 Service URLs
-
-- **API Server**: http://localhost:8080
-- **API Documentation**: http://localhost:8080/api-docs
-- **Email Testing UI**: http://localhost:8025
-
-## 📝 API Documentation
-
-### Authentication
-
-```http
-POST /auth/register     # User registration
-POST /auth/login       # User login
-GET  /auth/me          # Get authenticated user profile
-POST /auth/refresh     # Refresh token
-POST /auth/logout      # User logout
-```
-
-### User Management
-
-```http
-GET    /api/users      # List users (admin)
-GET    /api/users/:id  # Get user details
-PUT    /api/users/:id  # Update user
-DELETE /api/users/:id  # Delete user
-```
-
-### Two-Factor Authentication (2FA)
-
-```http
-POST /otp/enable       # Enable 2FA
-POST /otp/verify       # Verify OTP token
-POST /otp/disable      # Disable 2FA
-```
-
-## 🔧 Environment Variables
-
-```env
-# Server
-PORT=8080
-NODE_ENV=development
-
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-
-# Authentication
-JWT_SECRET="your-super-secure-secret"
-JWT_REFRESH_SECRET="your-refresh-secret"
-JWT_EXPIRES_IN="1h"
-
-# Email
-SMTP_HOST="smtp.example.com"
-SMTP_PORT=587
-SMTP_USER="your-email@example.com"
-SMTP_PASS="your-smtp-password"
-```
 
 ## 🧪 Testing
 
 ```bash
-# Unit Tests
-npm run test
+# Run all tests
+npm test
 
-# E2E Tests
-npm run test:e2e
+# Watch mode
+npm run test:watch
 
-# Coverage
+# Coverage report
 npm run test:coverage
 ```
 
-## 📈 Roadmap
+## 🔒 API Endpoints
 
-- [ ] Password Reset
-- [ ] Jest & Supertest testing
-- [ ] Redis Caching
-- [ ] WebSocket Support
-- [ ] Microservices Architecture
-- [ ] Kubernetes Configuration
+### Authentication
+
+```http
+POST /api/auth/register   # Create new account
+POST /api/auth/login      # Login
+GET  /api/auth/verify    # Verify email
+```
+
+### Two-Factor Authentication
+
+```http
+POST /api/otp/enable    # Enable 2FA
+POST /api/otp/verify    # Verify OTP
+POST /api/otp/disable   # Disable 2FA
+```
+
+## 🌐 Service URLs
+
+- **API**: http://localhost:8080
+- **Swagger Docs**: http://localhost:8080/api-docs
+- **Email Testing**: http://localhost:8025
 
 ## 🤝 Contributing
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-## 📄 License
+## 📝 License
 
-MIT License • Copyright (c) 2024 Francesco
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for full details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-Made with ❤️ to speed up the development of robust and secure APIs.
+Made with ❤️ by Francesco Mazzi
 
-[![Stargazers](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
+[![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
 </div>

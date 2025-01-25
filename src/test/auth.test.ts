@@ -5,6 +5,7 @@ import { LoginUseCase } from '../application/use-cases/auth/LoginUseCase';
 import { VerifyEmailUseCase } from '../application/use-cases/auth/VerifyEmailUseCase';
 import { IUserRepository } from '../domain/repositories/IUserRepository';
 import { User } from '@prisma/client';
+import { AppError } from '../domain/errors/AppError';
 
 jest.mock('../application/use-cases/auth/RegisterUseCase');
 jest.mock('../application/use-cases/auth/LoginUseCase');
@@ -68,8 +69,11 @@ describe('AuthController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        user: mockRegisteredUser,
-        message: 'User registered successfully',
+        status: 'success',
+        data: {
+          user: mockRegisteredUser,
+          message: 'User registered successfully',
+        },
       });
     });
 
@@ -84,15 +88,13 @@ describe('AuthController', () => {
         body: mockUser,
       };
 
-      const error = new Error('Email already exists');
-      jest.spyOn(registerUseCase, 'execute').mockRejectedValue(error);
+      jest
+        .spyOn(registerUseCase, 'execute')
+        .mockRejectedValue(new AppError(409, 'Email already exists', 'USER_EXISTS'));
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Email already exists',
-      });
+      await expect(
+        authController.register(mockRequest as Request, mockResponse as Response),
+      ).rejects.toThrow(AppError);
     });
   });
 
@@ -121,7 +123,10 @@ describe('AuthController', () => {
       await authController.login(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith(mockLoginResult);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'success',
+        data: mockLoginResult,
+      });
     });
 
     it('should handle invalid credentials', async () => {
@@ -134,15 +139,13 @@ describe('AuthController', () => {
         body: mockCredentials,
       };
 
-      const error = new Error('Invalid credentials');
-      jest.spyOn(loginUseCase, 'execute').mockRejectedValue(error);
+      jest
+        .spyOn(loginUseCase, 'execute')
+        .mockRejectedValue(new AppError(401, 'Invalid credentials', 'INVALID_CREDENTIALS'));
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(401);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Invalid credentials',
-      });
+      await expect(
+        authController.login(mockRequest as Request, mockResponse as Response),
+      ).rejects.toThrow(AppError);
     });
   });
 
@@ -160,6 +163,7 @@ describe('AuthController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'success',
         message: 'Email verified successfully',
       });
     });
@@ -171,15 +175,13 @@ describe('AuthController', () => {
         query: { token: mockToken },
       };
 
-      const error = new Error('Invalid verification token');
-      jest.spyOn(verifyEmailUseCase, 'execute').mockRejectedValue(error);
+      jest
+        .spyOn(verifyEmailUseCase, 'execute')
+        .mockRejectedValue(new AppError(400, 'Invalid verification token', 'INVALID_TOKEN'));
 
-      await authController.verifyEmail(mockRequest as Request, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Invalid verification token',
-      });
+      await expect(
+        authController.verifyEmail(mockRequest as Request, mockResponse as Response),
+      ).rejects.toThrow(AppError);
     });
   });
 });
