@@ -11,72 +11,78 @@
 [![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-A modern, production-ready authentication boilerplate built with TypeScript and Clean Architecture. Features comprehensive error handling, testing, and Docker support.
+Production-ready authentication boilerplate built with TypeScript and Clean Architecture.
+Get your secure API up and running in minutes! 🔥
 
-[Features](#-features) •
 [Quick Start](#-quick-start) •
-[Architecture](#-architecture) •
-[Documentation](#-api-documentation)
+[Features](#-features) •
+[Documentation](#-api-documentation) •
+[Docker](#-docker-setup)
 
 </div>
 
-## ✨ Features
+## ⚡️ One-Line Setup
 
-- 🔐 **Enterprise-Grade Authentication**
+```bash
+npx create-express-auth my-app && cd my-app && docker-compose up -d
+```
 
-  - JWT-based Authentication with refresh tokens
-  - Two-Factor Authentication (TOTP)
-  - Email Verification
-  - Comprehensive Error Handling
+## ✨ Key Features
 
-- 🏗 **Clean Architecture**
+### 🔐 Enterprise Security
 
-  - Domain-Driven Design
-  - Use Case Pattern
-  - Repository Pattern
-  - Centralized Error Management
+- **JWT Authentication** with refresh tokens
+- **Two-Factor Auth (2FA)** using TOTP
+- **Email Verification** flow
+- **Rate Limiting** with LRU Cache
+- **CORS Protection** built-in
 
-- 🛡 **Security First**
+### 🏗 Clean Architecture
 
-  - Rate Limiting with LRU Cache
-  - CORS Protection
-  - JWT Token Management
-  - Request Validation
+- **Domain-Driven Design** principles
+- **Use Case Pattern** for business logic
+- **Repository Pattern** for data access
+- **Error Handling** centralized & typed
 
-- 🧪 **Testing & Quality**
+### 🧪 Testing & Quality
 
-  - Jest with TypeScript
-  - Mocked Repositories
-  - 100% Type Coverage
-  - ESLint & Prettier
+- **100% Type Coverage** with TypeScript
+- **Jest Testing** setup with mocks
+- **ESLint & Prettier** configured
+- **Git Hooks** with Husky
 
-- 🐳 **Docker Ready**
-  - Multi-stage builds
-  - PostgreSQL with Health Checks
-  - MailHog for Email Testing
-  - Hot Reload in Development
+### 🐳 Docker Ready
+
+- **Multi-stage builds** optimized
+- **PostgreSQL** with health checks
+- **MailHog** for email testing
+- **Hot Reload** in development
 
 ## 🚀 Quick Start
 
-```bash
-# Create a new project
-npx create-express-auth my-app
+1. **Create Project**
+   \`\`\`bash
+   npx create-express-auth my-app
+   cd my-app
+   \`\`\`
 
-# Navigate to project
-cd my-app
+2. **Configure Environment**
+   \`\`\`bash
+   cp .env.example .env
+   \`\`\`
 
-# Copy environment variables
-cp .env.example .env
+3. **Start Services**
+   \`\`\`bash
+   docker-compose up -d
+   \`\`\`
 
-# Start services with Docker
-docker-compose up -d
+4. **Initialize Database**
+   \`\`\`bash
+   npm run prisma:generate
+   npx prisma migrate dev
+   \`\`\`
 
-# Generate Prisma client and run migrations
-npm run prisma:generate
-npx prisma migrate dev
-```
-
-## 🏗 Project Structure
+🎉 Your API is now running at http://localhost:8080!
 
 ```
 src/
@@ -98,94 +104,67 @@ src/
 └── test/               # Test files and setup
 ```
 
-## 🔧 Environment Variables
+### 🔒 Two-Factor Auth
 
-```env
-# Server
-PORT=8080
-NODE_ENV=development
+\`\`\`http
+POST /api/otp/enable # Setup 2FA
+POST /api/otp/verify # Verify OTP
+POST /api/otp/disable # Disable 2FA
+\`\`\`
 
-# Database
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/auth-boiler-plate"
+## 🐳 Docker Setup
 
-# JWT
-JWT_SECRET="change-this-secret-in-production"
-JWT_EXPIRES_IN="1d"
+Services included:
 
-# Email
-SMTP_HOST="mailhog"
-SMTP_PORT=1025
-```
+- **API**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/api-docs
+- **PostgreSQL**: localhost:5432
+- **MailHog UI**: http://localhost:8025
 
-## 🧪 Testing
+## 🧪 Development
 
 ```bash
+# Start development server
+npm run dev
+
 # Run tests
 npm test
 
-# Watch mode
-npm run test:watch
+# Lint and format
+npm run lint
+npm run format
 
-# Coverage report
-npm run test:coverage
-```
-
-## 📚 API Documentation
-
-### Authentication
-
-```http
-POST /api/auth/register   # Register new user
-POST /api/auth/login      # Login user
-GET  /api/auth/verify    # Verify email
-```
-
-### Two-Factor Authentication
-
-```http
-POST /api/otp/enable     # Enable 2FA
-POST /api/otp/verify     # Verify OTP
-POST /api/otp/disable    # Disable 2FA
-```
-
-## 🌐 Available Services
-
-- **API**: http://localhost:8080
-- **API Docs**: http://localhost:8080/api-docs
-- **Email Testing**: http://localhost:8025
-- **Database**: localhost:5432
-
-## 🛠 Development Scripts
-
-```bash
-# Development
-npm run dev         # Start with hot-reload
-npm run lint       # Run ESLint
-npm run format    # Run Prettier
-
-# Database
-npm run prisma:generate  # Generate Prisma client
+# Database operations
+npm run prisma:generate  # Generate client
 npm run prisma:migrate   # Run migrations
 npm run seed            # Seed database
-
-# Docker
-npm run docker:up      # Start containers
-npm run docker:down    # Stop containers
-npm run docker:logs    # View logs
 ```
+
+## 📦 Project Structure
+
+\`\`\`
+src/
+├── application/ # Business Logic & Use Cases
+├── domain/ # Entities & Interfaces
+├── infrastructure/ # Framework & Drivers
+│ ├── http/ # Express Setup
+│ └── services/ # External Services
+└── test/ # Test Suite
+\`\`\`
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Check out our [Contributing Guide](CONTRIBUTING.md).
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT © [Francesco Mazzi](LICENSE)
 
 ---
 
 <div align="center">
-Made with ❤️ by Francesco Mazzi
+
+Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
 
 [![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
