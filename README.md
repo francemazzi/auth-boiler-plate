@@ -34,7 +34,7 @@ npx create-express-auth my-app && cd my-app && docker-compose up -d
 - **JWT Authentication** with refresh tokens
 - **Two-Factor Auth (2FA)** using TOTP
 - **Email Verification** flow
-- **Rate Limiting** with LRU Cache
+- **Rate Limiting** with LRU cache
 - **CORS Protection** built-in
 
 ### 🏗 Clean Architecture
@@ -84,27 +84,17 @@ npx create-express-auth my-app && cd my-app && docker-compose up -d
 
 🎉 Your API is now running at http://localhost:8080!
 
-```
-src/
-├── application/          # Application business logic
-│   └── use-cases/       # Use cases for auth and OTP
-│
-├── domain/              # Domain layer
-│   ├── entities/        # Domain entities
-│   ├── repositories/    # Repository interfaces
-│   └── errors/         # Custom error handling
-│
-├── infrastructure/      # External interfaces
-│   ├── http/           # Express configuration
-│   │   ├── controllers/  # Request handlers
-│   │   ├── middlewares/ # Auth, errors, rate limiting
-│   │   └── routes/      # API routes
-│   └── services/       # External services
-│
-└── test/               # Test files and setup
-```
+## 📚 API Documentation
 
-### 🔒 Two-Factor Auth
+### 🔑 Authentication
+
+\`\`\`http
+POST /api/auth/register # Create new account
+POST /api/auth/login # Get JWT token
+GET /api/auth/verify # Verify email
+\`\`\`
+
+### 🔒 Two-Factor Authentication
 
 \`\`\`http
 POST /api/otp/enable # Setup 2FA
@@ -121,7 +111,7 @@ Services included:
 - **PostgreSQL**: localhost:5432
 - **MailHog UI**: http://localhost:8025
 
-## 🧪 Development
+## 🛠 Development
 
 ```bash
 # Start development server
@@ -145,16 +135,26 @@ npm run seed            # Seed database
 \`\`\`
 src/
 ├── application/ # Business Logic & Use Cases
-├── domain/ # Entities & Interfaces
-├── infrastructure/ # Framework & Drivers
-│ ├── http/ # Express Setup
+│ └── use-cases/ # Use cases for auth and OTP
+│
+├── domain/ # Domain Layer
+│ ├── entities/ # Domain Entities
+│ ├── repositories/ # Repository Interfaces
+│ └── errors/ # Error Handling
+│
+├── infrastructure/ # External Interfaces
+│ ├── http/ # Express Configuration
+│ │ ├── controllers/ # Request Handlers
+│ │ ├── middlewares/ # Auth, Errors, Rate Limiting
+│ │ └── routes/ # API Routes
 │ └── services/ # External Services
+│
 └── test/ # Test Suite
 \`\`\`
 
 ## 🤝 Contributing
 
-Contributions welcome! Check out our [Contributing Guide](CONTRIBUTING.md).
+Want to contribute? Check out our [Contributing Guide](CONTRIBUTING.md)!
 
 ## 📝 License
 
@@ -165,6 +165,92 @@ MIT © [Francesco Mazzi](LICENSE)
 <div align="center">
 
 Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
+
+[![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
+
+</div>
+
+```
+src/
+├── application/          # Application business logic
+│   └── use-cases/       # Use cases for auth and OTP
+│
+├── domain/              # Domain layer
+│   ├── entities/        # Domain entities
+│   ├── repositories/    # Repository interfaces
+│   └── errors/         # Custom error handling
+│
+├── infrastructure/      # Framework and Driver
+│   ├── http/           # Setup Express
+│   │   ├── controllers/  # Request handlers
+│   │   ├── middlewares/ # Auth, errors, rate limiting
+│   │   └── routes/      # API routes
+│   └── services/       # Servizi Esterni
+│
+└── test/               # Suite di Test
+```
+
+### 🔒 Two-Factor Auth
+
+\`\`\`http
+POST /api/otp/enable # Setup 2FA
+POST /api/otp/verify # Verify OTP
+POST /api/otp/disable # Disable 2FA
+\`\`\`
+
+## 🐳 Docker Setup
+
+Servizi inclusi:
+
+- **API**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/api-docs
+- **PostgreSQL**: localhost:5432
+- **MailHog UI**: http://localhost:8025
+
+## 🧪 Development
+
+```bash
+# Avvia server di sviluppo
+npm run dev
+
+# Esegui i test
+npm test
+
+# Lint e formattazione
+npm run lint
+npm run format
+
+# Operazioni database
+npm run prisma:generate  # Genera client
+npm run prisma:migrate   # Esegui migrazioni
+npm run seed            # Popola database
+```
+
+## 📦 Struttura del Progetto
+
+\`\`\`
+src/
+├── application/ # Logica di Business
+├── domain/ # Entità e Interfacce
+├── infrastructure/ # Framework e Driver
+│ ├── http/ # Setup Express
+│ └── services/ # Servizi Esterni
+└── test/ # Suite di Test
+\`\`\`
+
+## 🤝 Contribuisci
+
+Vuoi contribuire? Dai un'occhiata alla nostra [Guida per i Contributori](CONTRIBUTING.md)!
+
+## 📝 Licenza
+
+MIT © [Francesco Mazzi](LICENSE)
+
+---
+
+<div align="center">
+
+Realizzato con ❤️ da [Francesco Mazzi](https://github.com/francemazzi)
 
 [![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
