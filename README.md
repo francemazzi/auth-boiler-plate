@@ -56,13 +56,13 @@ POST /api/otp/disable # Disable 2FA
 
 ## 📦 Project Structure
 
-\`\`\`
+```
 src/
 ├── application/ # Business Logic
 ├── domain/ # Core Business Rules
 ├── infrastructure/ # External Interfaces
 └── test/ # Test Suite
-\`\`\`
+```
 
 ## 🛠 Development
 
