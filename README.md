@@ -16,8 +16,8 @@ Get your secure API up and running in minutes! 🔥
 
 [Quick Start](#-quick-start) •
 [Features](#-features) •
-[Documentation](#-api-documentation) •
-[Docker](#-docker-setup)
+[Documentation](#-documentation) •
+[Development](#-development)
 
 </div>
 
@@ -27,36 +27,130 @@ Get your secure API up and running in minutes! 🔥
 npx create-express-auth my-app && cd my-app && docker-compose up -d
 ```
 
-## ✨ Key Features
+## ✨ Features
 
 ### 🔐 Enterprise Security
 
-- **JWT Authentication** with refresh tokens
-- **Two-Factor Auth (2FA)** using TOTP
-- **Email Verification** flow
-- **Rate Limiting** with LRU cache
-- **CORS Protection** built-in
+- **JWT Authentication** with refresh tokens and secure session management
+- **Two-Factor Auth (2FA)** using TOTP with QR code support
+- **Email Verification** with secure token-based flow
+- **Rate Limiting** using LRU cache for DDoS protection
+- **CORS Protection** with configurable origins
+- **Password Hashing** with bcrypt and salt rounds
+- **XSS Protection** with security headers
+- **SQL Injection Prevention** with Prisma ORM
 
 ### 🏗 Clean Architecture
 
-- **Domain-Driven Design** principles
-- **Use Case Pattern** for business logic
-- **Repository Pattern** for data access
-- **Error Handling** centralized & typed
+- **Domain-Driven Design** principles for scalable code organization
+- **Use Case Pattern** for clear business logic separation
+- **Repository Pattern** for database abstraction
+- **Error Handling** with custom AppError class
+- **Dependency Injection** for better testing and modularity
+- **Service Layer** for external integrations
 
 ### 🧪 Testing & Quality
 
 - **100% Type Coverage** with TypeScript
-- **Jest Testing** setup with mocks
-- **ESLint & Prettier** configured
-- **Git Hooks** with Husky
+- **Integration Tests** with Jest and supertest
+- **Unit Tests** with mocked repositories
+- **E2E Tests** for critical flows
+- **ESLint & Prettier** for code consistency
+- **Git Hooks** with Husky for pre-commit checks
+- **CI/CD Pipeline** with GitHub Actions
 
-### 🐳 Docker Ready
+### 🐳 Docker & Infrastructure
 
-- **Multi-stage builds** optimized
-- **PostgreSQL** with health checks
-- **MailHog** for email testing
-- **Hot Reload** in development
+- **Multi-stage builds** for optimal container size
+- **PostgreSQL** with health checks and persistence
+- **MailHog** for local email testing
+- **Hot Reload** for rapid development
+- **Environment Variables** management
+- **Logging** with Winston
+- **API Documentation** with Swagger UI
+
+## 📚 Documentation
+
+### Authentication Endpoints
+
+#### 🔑 Register User
+
+\`\`\`http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+"email": "user@example.com",
+"password": "securePassword123",
+"name": "John Doe"
+}
+\`\`\`
+
+#### 🔓 Login
+
+\`\`\`http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+"email": "user@example.com",
+"password": "securePassword123"
+}
+\`\`\`
+
+#### ✉️ Verify Email
+
+\`\`\`http
+GET /api/auth/verify?token=verification-token
+\`\`\`
+
+### Two-Factor Authentication
+
+#### 🔒 Enable 2FA
+
+\`\`\`http
+POST /api/otp/enable
+Authorization: Bearer <token>
+\`\`\`
+
+#### 🔍 Verify OTP
+
+\`\`\`http
+POST /api/otp/verify
+Authorization: Bearer <token>
+
+{
+"token": "123456"
+}
+\`\`\`
+
+### Response Examples
+
+#### Success Response
+
+\`\`\`json
+{
+"status": "success",
+"data": {
+"user": {
+"id": "user-id",
+"email": "user@example.com",
+"name": "John Doe"
+},
+"token": "jwt-token"
+}
+}
+\`\`\`
+
+#### Error Response
+
+\`\`\`json
+{
+"status": "error",
+"message": "Invalid credentials",
+"code": "INVALID_CREDENTIALS"
+}
+\`\`\`
 
 ## 🚀 Quick Start
 
@@ -84,33 +178,6 @@ npx create-express-auth my-app && cd my-app && docker-compose up -d
 
 🎉 Your API is now running at http://localhost:8080!
 
-## 📚 API Documentation
-
-### 🔑 Authentication
-
-\`\`\`http
-POST /api/auth/register # Create new account
-POST /api/auth/login # Get JWT token
-GET /api/auth/verify # Verify email
-\`\`\`
-
-### 🔒 Two-Factor Authentication
-
-\`\`\`http
-POST /api/otp/enable # Setup 2FA
-POST /api/otp/verify # Verify OTP
-POST /api/otp/disable # Disable 2FA
-\`\`\`
-
-## 🐳 Docker Setup
-
-Services included:
-
-- **API**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/api-docs
-- **PostgreSQL**: localhost:5432
-- **MailHog UI**: http://localhost:8025
-
 ## 🛠 Development
 
 ```bash
@@ -135,21 +202,21 @@ npm run seed            # Seed database
 \`\`\`
 src/
 ├── application/ # Business Logic & Use Cases
-│ └── use-cases/ # Use cases for auth and OTP
+│ └── use-cases/ # Auth and OTP implementations
 │
-├── domain/ # Domain Layer
-│ ├── entities/ # Domain Entities
-│ ├── repositories/ # Repository Interfaces
-│ └── errors/ # Error Handling
+├── domain/ # Core Business Rules
+│ ├── entities/ # Business Objects
+│ ├── repositories/ # Data Access Contracts
+│ └── errors/ # Custom Error Handling
 │
 ├── infrastructure/ # External Interfaces
 │ ├── http/ # Express Configuration
 │ │ ├── controllers/ # Request Handlers
-│ │ ├── middlewares/ # Auth, Errors, Rate Limiting
+│ │ ├── middlewares/ # Request Pipeline
 │ │ └── routes/ # API Routes
 │ └── services/ # External Services
 │
-└── test/ # Test Suite
+└── test/ # Test Suites
 \`\`\`
 
 ## 🤝 Contributing
@@ -165,92 +232,6 @@ MIT © [Francesco Mazzi](LICENSE)
 <div align="center">
 
 Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
-
-[![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
-
-</div>
-
-```
-src/
-├── application/          # Application business logic
-│   └── use-cases/       # Use cases for auth and OTP
-│
-├── domain/              # Domain layer
-│   ├── entities/        # Domain entities
-│   ├── repositories/    # Repository interfaces
-│   └── errors/         # Custom error handling
-│
-├── infrastructure/      # Framework and Driver
-│   ├── http/           # Setup Express
-│   │   ├── controllers/  # Request handlers
-│   │   ├── middlewares/ # Auth, errors, rate limiting
-│   │   └── routes/      # API routes
-│   └── services/       # Servizi Esterni
-│
-└── test/               # Suite di Test
-```
-
-### 🔒 Two-Factor Auth
-
-\`\`\`http
-POST /api/otp/enable # Setup 2FA
-POST /api/otp/verify # Verify OTP
-POST /api/otp/disable # Disable 2FA
-\`\`\`
-
-## 🐳 Docker Setup
-
-Servizi inclusi:
-
-- **API**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/api-docs
-- **PostgreSQL**: localhost:5432
-- **MailHog UI**: http://localhost:8025
-
-## 🧪 Development
-
-```bash
-# Avvia server di sviluppo
-npm run dev
-
-# Esegui i test
-npm test
-
-# Lint e formattazione
-npm run lint
-npm run format
-
-# Operazioni database
-npm run prisma:generate  # Genera client
-npm run prisma:migrate   # Esegui migrazioni
-npm run seed            # Popola database
-```
-
-## 📦 Struttura del Progetto
-
-\`\`\`
-src/
-├── application/ # Logica di Business
-├── domain/ # Entità e Interfacce
-├── infrastructure/ # Framework e Driver
-│ ├── http/ # Setup Express
-│ └── services/ # Servizi Esterni
-└── test/ # Suite di Test
-\`\`\`
-
-## 🤝 Contribuisci
-
-Vuoi contribuire? Dai un'occhiata alla nostra [Guida per i Contributori](CONTRIBUTING.md)!
-
-## 📝 Licenza
-
-MIT © [Francesco Mazzi](LICENSE)
-
----
-
-<div align="center">
-
-Realizzato con ❤️ da [Francesco Mazzi](https://github.com/francemazzi)
 
 [![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
