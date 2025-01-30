@@ -12,171 +12,57 @@
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 Production-ready authentication boilerplate built with TypeScript and Clean Architecture.
-Get your secure API up and running in minutes! 🔥
 
 [Quick Start](#-quick-start) •
 [Features](#-features) •
-[Documentation](#-documentation) •
-[Development](#-development)
+[Documentation](#-documentation)
 
 </div>
 
-## ⚡️ One-Line Setup
-
-```bash
-npx create-express-auth my-app && cd my-app && docker-compose up -d
-```
-
 ## ✨ Features
 
-### 🔐 Enterprise Security
+- 🔐 **Authentication**: JWT, 2FA, Email Verification
+- 🏗 **Clean Architecture**: DDD, Use Cases, Repository Pattern
+- 🧪 **Testing**: Jest, Integration & Unit Tests
+- 🐳 **Docker Ready**: PostgreSQL, MailHog, Hot Reload
 
-- **JWT Authentication** with refresh tokens and secure session management
-- **Two-Factor Auth (2FA)** using TOTP with QR code support
-- **Email Verification** with secure token-based flow
-- **Rate Limiting** using LRU cache for DDoS protection
-- **CORS Protection** with configurable origins
-- **Password Hashing** with bcrypt and salt rounds
-- **XSS Protection** with security headers
-- **SQL Injection Prevention** with Prisma ORM
+## 🚀 Quick Start
 
-### 🏗 Clean Architecture
+```bash
+# Create project
+npx create-express-auth my-app
 
-- **Domain-Driven Design** principles for scalable code organization
-- **Use Case Pattern** for clear business logic separation
-- **Repository Pattern** for database abstraction
-- **Error Handling** with custom AppError class
-- **Dependency Injection** for better testing and modularity
-- **Service Layer** for external integrations
-
-### 🧪 Testing & Quality
-
-- **100% Type Coverage** with TypeScript
-- **Integration Tests** with Jest and supertest
-- **Unit Tests** with mocked repositories
-- **E2E Tests** for critical flows
-- **ESLint & Prettier** for code consistency
-- **Git Hooks** with Husky for pre-commit checks
-- **CI/CD Pipeline** with GitHub Actions
-
-### 🐳 Docker & Infrastructure
-
-- **Multi-stage builds** for optimal container size
-- **PostgreSQL** with health checks and persistence
-- **MailHog** for local email testing
-- **Hot Reload** for rapid development
-- **Environment Variables** management
-- **Logging** with Winston
-- **API Documentation** with Swagger UI
+# Start services
+cd my-app && docker-compose up -d
+```
 
 ## 📚 Documentation
 
 ### Authentication Endpoints
 
-#### 🔑 Register User
-
 \`\`\`http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-"email": "user@example.com",
-"password": "securePassword123",
-"name": "John Doe"
-}
-\`\`\`
-
-#### 🔓 Login
-
-\`\`\`http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-"email": "user@example.com",
-"password": "securePassword123"
-}
-\`\`\`
-
-#### ✉️ Verify Email
-
-\`\`\`http
-GET /api/auth/verify?token=verification-token
+POST /api/auth/register # Create account
+POST /api/auth/login # Get JWT token
+GET /api/auth/verify # Verify email
 \`\`\`
 
 ### Two-Factor Authentication
 
-#### 🔒 Enable 2FA
-
 \`\`\`http
-POST /api/otp/enable
-Authorization: Bearer <token>
+POST /api/otp/enable # Setup 2FA
+POST /api/otp/verify # Verify OTP
+POST /api/otp/disable # Disable 2FA
 \`\`\`
 
-#### 🔍 Verify OTP
+## 📦 Project Structure
 
-\`\`\`http
-POST /api/otp/verify
-Authorization: Bearer <token>
-
-{
-"token": "123456"
-}
 \`\`\`
-
-### Response Examples
-
-#### Success Response
-
-\`\`\`json
-{
-"status": "success",
-"data": {
-"user": {
-"id": "user-id",
-"email": "user@example.com",
-"name": "John Doe"
-},
-"token": "jwt-token"
-}
-}
+src/
+├── application/ # Business Logic
+├── domain/ # Core Business Rules
+├── infrastructure/ # External Interfaces
+└── test/ # Test Suite
 \`\`\`
-
-#### Error Response
-
-\`\`\`json
-{
-"status": "error",
-"message": "Invalid credentials",
-"code": "INVALID_CREDENTIALS"
-}
-\`\`\`
-
-## 🚀 Quick Start
-
-1. **Create Project**
-   \`\`\`bash
-   npx create-express-auth my-app
-   cd my-app
-   \`\`\`
-
-2. **Configure Environment**
-   \`\`\`bash
-   cp .env.example .env
-   \`\`\`
-
-3. **Start Services**
-   \`\`\`bash
-   docker-compose up -d
-   \`\`\`
-
-4. **Initialize Database**
-   \`\`\`bash
-   npm run prisma:generate
-   npx prisma migrate dev
-   \`\`\`
-
-🎉 Your API is now running at http://localhost:8080!
 
 ## 🛠 Development
 
@@ -187,41 +73,10 @@ npm run dev
 # Run tests
 npm test
 
-# Lint and format
-npm run lint
-npm run format
-
 # Database operations
-npm run prisma:generate  # Generate client
-npm run prisma:migrate   # Run migrations
-npm run seed            # Seed database
+npm run prisma:generate
+npm run prisma:migrate
 ```
-
-## 📦 Project Structure
-
-\`\`\`
-src/
-├── application/ # Business Logic & Use Cases
-│ └── use-cases/ # Auth and OTP implementations
-│
-├── domain/ # Core Business Rules
-│ ├── entities/ # Business Objects
-│ ├── repositories/ # Data Access Contracts
-│ └── errors/ # Custom Error Handling
-│
-├── infrastructure/ # External Interfaces
-│ ├── http/ # Express Configuration
-│ │ ├── controllers/ # Request Handlers
-│ │ ├── middlewares/ # Request Pipeline
-│ │ └── routes/ # API Routes
-│ └── services/ # External Services
-│
-└── test/ # Test Suites
-\`\`\`
-
-## 🤝 Contributing
-
-Want to contribute? Check out our [Contributing Guide](CONTRIBUTING.md)!
 
 ## 📝 License
 
@@ -232,7 +87,5 @@ MIT © [Francesco Mazzi](LICENSE)
 <div align="center">
 
 Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
-
-[![GitHub Stars](https://img.shields.io/github/stars/francemazzi/auth-boiler-plate?style=social)](https://github.com/francemazzi/auth-boiler-plate)
 
 </div>
