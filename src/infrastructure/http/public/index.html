@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FormIt API</title>
+    <title>${process.env.APP_NAME || 'Auth Boiler Plate'}</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
@@ -45,7 +45,9 @@
         border-radius: 0.5rem;
         cursor: pointer;
         text-decoration: none;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .button:hover {
@@ -62,10 +64,7 @@
     <div class="container">
       <div class="logo">🚀</div>
       <h1>FormIt API</h1>
-      <p>
-        Benvenuto nell'API auth boiler plate. Esplora la documentazione per
-        iniziare.
-      </p>
+      <p>Benvenuto nell'API auth boiler plate. Esplora la documentazione per iniziare.</p>
       <a href="/api-docs" class="button">Vai alla Documentazione</a>
     </div>
   </body>

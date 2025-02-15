@@ -54,7 +54,7 @@ app.get('/api-docs', (_req: Request, res: Response) => {
   return res.send(swaggerUi.generateHTML(swaggerSpec));
 });
 
-app.use('/api', router);
+app.use(router);
 
 app.use(errorHandler);
 
