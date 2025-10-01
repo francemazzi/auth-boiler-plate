@@ -1,11 +1,12 @@
-import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import { AuthController } from "../controllers/AuthController";
-import { RegisterUseCase } from "../../../application/use-cases/auth/RegisterUseCase";
-import { LoginUseCase } from "../../../application/use-cases/auth/LoginUseCase";
-import { VerifyEmailUseCase } from "../../../application/use-cases/auth/VerifyEmailUseCase";
-import { PrismaUserRepository } from "../../repositories/PrismaUserRepository";
-import { ensureAuthenticated } from "../middlewares/ensureAuthenticated";
+import { Router, Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { AuthController } from '../controllers/AuthController';
+import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase';
+import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase';
+import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase';
+import { PrismaUserRepository } from '../../repositories/PrismaUserRepository';
+import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
+import { asyncHandler } from '../middlewares/asyncHandler';
 
 const authRouter = Router();
 const prisma = new PrismaClient();
@@ -15,11 +16,7 @@ const registerUseCase = new RegisterUseCase(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
 
-const authController = new AuthController(
-  registerUseCase,
-  loginUseCase,
-  verifyEmailUseCase
-);
+const authController = new AuthController(registerUseCase, loginUseCase, verifyEmailUseCase);
 
 /**
  * @swagger
@@ -51,8 +48,13 @@ const authController = new AuthController(
  *         description: Utente registrato con successo
  *       400:
  *         description: Errore nella registrazione
+ *       409:
+ *         description: Utente già esistente
  */
-authRouter.post("/register", (req, res) => authController.register(req, res));
+authRouter.post(
+  '/register',
+  asyncHandler((req, res) => authController.register(req, res)),
+);
 
 /**
  * @swagger
@@ -97,7 +99,10 @@ authRouter.post("/register", (req, res) => authController.register(req, res));
  *       400:
  *         description: Credenziali non valide
  */
-authRouter.post("/login", (req, res) => authController.login(req, res));
+authRouter.post(
+  '/login',
+  asyncHandler((req, res) => authController.login(req, res)),
+);
 
 /**
  * @swagger
@@ -117,7 +122,10 @@ authRouter.post("/login", (req, res) => authController.login(req, res));
  *       400:
  *         description: Token non valido
  */
-authRouter.get("/verify", (req, res) => authController.verifyEmail(req, res));
+authRouter.get(
+  '/verify',
+  asyncHandler((req, res) => authController.verifyEmail(req, res)),
+);
 
 /**
  * @swagger
@@ -127,6 +135,7 @@ authRouter.get("/verify", (req, res) => authController.verifyEmail(req, res));
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Dati dell'utente
@@ -148,34 +157,29 @@ authRouter.get("/verify", (req, res) => authController.verifyEmail(req, res));
  *       404:
  *         description: Utente non trovato
  */
-authRouter.get(
-  "/me",
-  ensureAuthenticated,
-  async (req: Request, res: Response) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const user = await userRepository.findById(req.user.id);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      return res.json({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        emailVerified: user.emailVerified,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message:
-          error instanceof Error ? error.message : "Internal server error",
-      });
+authRouter.get('/me', ensureAuthenticated, async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
     }
+
+    const user = await userRepository.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      emailVerified: user.emailVerified,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error instanceof Error ? error.message : 'Internal server error',
+    });
   }
-);
+});
 
 export { authRouter };

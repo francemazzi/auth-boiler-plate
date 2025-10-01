@@ -60,8 +60,11 @@ Get your secure API up and running in minutes! 🔥
 ## 🚀 Quick Start
 
 ```bash
-# Create new project
+# Create new project (npm)
 npx create-express-auth my-app
+
+# Or with Bun
+bunx create-express-auth my-app
 
 # Navigate and start services
 cd my-app && docker-compose up -d
@@ -88,16 +91,19 @@ POST /api/otp/disable      # Disable 2FA
 ## 🛠 Development
 
 ```bash
-# Start development server
+# Using npm
 npm run dev
-
-# Run tests
 npm test
-
-# Database operations
 npm run prisma:generate    # Generate Prisma client
 npm run prisma:migrate     # Run migrations
-npm run seed              # Seed database
+npm run seed               # Seed database
+
+# Using Bun
+bun run dev
+bun run test
+bun run prisma:generate    # Generate Prisma client
+bun run prisma:migrate     # Run migrations
+bun run seed               # Seed database
 ```
 
 ## 📦 Project Structure
@@ -126,7 +132,7 @@ src/
 
 ```env
 # Server
-PORT=8080
+PORT=8081
 NODE_ENV=development
 
 # Database
@@ -143,8 +149,8 @@ SMTP_PORT=1025
 
 ## 🌐 Available Services
 
-- **API**: [http://localhost:8080](http://localhost:8080)
-- **API Docs**: [http://localhost:8080/api-docs](http://localhost:8080/api-docs)
+- **API**: [http://localhost:8081](http://localhost:8081)
+- **API Docs**: [http://localhost:8081/api-docs](http://localhost:8081/api-docs)
 - **Email UI**: [http://localhost:8025](http://localhost:8025)
 - **Database**: localhost:5432
 

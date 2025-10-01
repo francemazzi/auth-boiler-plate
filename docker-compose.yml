@@ -3,14 +3,14 @@ services:
   app:
     build: .
     ports:
-      - '8080:8080'
+      - '8081:8081'
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth-boiler-plate?schema=public
       - JWT_SECRET=change-this-secret-in-production
       - JWT_EXPIRES_IN="1d"
       - SMTP_HOST=mailhog
       - SMTP_PORT=1025
-      - FRONTEND_URL=http://localhost:8080
+      - FRONTEND_URL=http://localhost:8081
       - NODE_ENV=development
     volumes:
       - .:/usr/src/app
@@ -21,14 +21,15 @@ services:
       mailhog:
         condition: service_started
     command: >
-      sh -c "npm ci &&
-             npm run prisma:generate &&
-             npm run dev"
+      sh -c "bun install &&
+             bunx prisma migrate deploy &&
+             bunx prisma generate &&
+             bun run build &&
+             bun ./dist/infrastructure/http/server.js"
 
   postgres:
     image: postgres:15.5-alpine
     platform: linux/arm64
-    container_name: postgres
     ports:
       - '5432:5432'
     environment:

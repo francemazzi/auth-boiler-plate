@@ -64,4 +64,31 @@ export class EmailService {
       socket.end();
     }
   }
+
+  async sendTestEmail(email: string): Promise<void> {
+    const socket = await this.createConnection();
+    const appName = (process.env.APP_NAME || 'Auth Boiler Plate').toLowerCase().replace(/ /g, '-');
+
+    const message = [
+      `Subject: Test email from ${appName}`,
+      `From: ${process.env.APP_NAME || 'Auth Boiler Plate'} App <noreply@${appName}.com>`,
+      `To: ${email}`,
+      'Content-Type: text/plain; charset=utf-8',
+      '',
+      'This is a test email to confirm SMTP connectivity.',
+      '.',
+      '',
+    ].join('\r\n');
+
+    try {
+      await this.sendCommand(socket, `HELO ${appName}.com`);
+      await this.sendCommand(socket, `MAIL FROM:<noreply@${appName}.com>`);
+      await this.sendCommand(socket, `RCPT TO:<${email}>`);
+      await this.sendCommand(socket, 'DATA');
+      await this.sendCommand(socket, message);
+      await this.sendCommand(socket, 'QUIT');
+    } finally {
+      socket.end();
+    }
+  }
 }

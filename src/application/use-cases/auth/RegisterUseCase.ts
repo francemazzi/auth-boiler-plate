@@ -1,8 +1,8 @@
-import { hash } from "bcryptjs";
-import { sign } from "jsonwebtoken";
-import { User } from "../../../domain/entities/User";
-import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { EmailService } from "../../../infrastructure/services/EmailService";
+import { hash } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
+import { User } from '../../../domain/entities/User';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import { EmailService } from '../../../infrastructure/services/EmailService';
 
 interface RegisterDTO {
   email: string;
@@ -21,7 +21,7 @@ export class RegisterUseCase {
     const userExists = await this.userRepository.findByEmail(email);
 
     if (userExists) {
-      throw new Error("User already exists");
+      throw new Error('User already exists');
     }
 
     const hashedPassword = await hash(password, 8);
@@ -37,19 +37,24 @@ export class RegisterUseCase {
     const verificationToken = sign(
       {
         userId: createdUser.id,
-        type: "email_verification",
+        type: 'email_verification',
       },
-      process.env.JWT_SECRET || "default_secret",
+      process.env.JWT_SECRET || 'default_secret',
       {
-        expiresIn: "1d",
-      }
+        expiresIn: '1d',
+      },
     );
 
-    await this.emailService.sendWelcomeEmail(
-      createdUser.email,
-      createdUser.name,
-      verificationToken
-    );
+    // Best-effort email: non bloccare la registrazione se l'email fallisce
+    try {
+      await this.emailService.sendWelcomeEmail(
+        createdUser.email,
+        createdUser.name,
+        verificationToken,
+      );
+    } catch (_) {
+      // Intenzionalmente ignorato in sviluppo: l'invio email non deve invalidare la registrazione
+    }
 
     return createdUser;
   }

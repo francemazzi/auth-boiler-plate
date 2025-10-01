@@ -53,6 +53,13 @@ export class AuthController {
         password,
       });
 
+      response.cookie('auth_token', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
       return response.status(200).json({
         status: 'success',
         data: result,

@@ -1,18 +1,20 @@
 import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import { router } from './routes';
 import { errorHandler } from './middlewares/error';
 import { rateLimiter } from './middlewares/rateLimiter';
 import path from 'path';
+import { swaggerSpec } from './swagger';
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(rateLimiter);
 
 app.use((req: Request, _res: Response, next: NextFunction) => {
@@ -38,20 +40,16 @@ app.get('/health', (_req: Request, res: Response) => {
   return res.json({ status: 'ok' });
 });
 
-const swaggerSpec = swaggerJsdoc({
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Express Auth API',
-      version: '1.0.0',
-    },
-  },
-  apis: ['./src/infrastructure/http/routes/*.ts'],
-});
-
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', (_req: Request, res: Response) => {
-  return res.send(swaggerUi.generateHTML(swaggerSpec));
+  return res.send(
+    swaggerUi.generateHTML(swaggerSpec, {
+      customSiteTitle: process.env.APP_NAME || 'Auth Boiler Plate',
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    }),
+  );
 });
 
 app.use(router);

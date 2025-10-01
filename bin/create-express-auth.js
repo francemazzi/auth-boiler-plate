@@ -119,9 +119,9 @@ try {
 
   console.log(`${colors.bright}🔗 Application:${colors.reset}`);
   console.log(
-    `${colors.bright}📚 API Documentation:${colors.reset} http://localhost:8080/api-docs`,
+    `${colors.bright}📚 API Documentation:${colors.reset} http://localhost:8081/api-docs`,
   );
-  console.log(`${colors.bright}🔧 Server:${colors.reset} http://localhost:8080\n`);
+  console.log(`${colors.bright}🔧 Server:${colors.reset} http://localhost:8081\n`);
   console.log(`${colors.green}Happy coding! 💻${colors.reset}\n`);
 } catch (error) {
   console.error(`\n${colors.red}${colors.bright}❌ Error creating project:${colors.reset}`);

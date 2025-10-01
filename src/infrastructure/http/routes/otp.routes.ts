@@ -6,6 +6,7 @@ import { EnableOTPUseCase } from '../../../application/use-cases/otp/EnableOTPUs
 import { VerifyOTPUseCase } from '../../../application/use-cases/otp/VerifyOTPUseCase';
 import { DisableOTPUseCase } from '../../../application/use-cases/otp/DisableOTPUseCase';
 import { authenticate } from '../middlewares/auth';
+import { asyncHandler } from '../middlewares/asyncHandler';
 
 export const otpRouter = Router();
 const prisma = new PrismaClient();
@@ -27,6 +28,7 @@ otpRouter.use(authenticate);
  *     summary: Abilita l'autenticazione a due fattori per l'utente
  *     security:
  *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: OTP abilitato con successo
@@ -46,7 +48,10 @@ otpRouter.use(authenticate);
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post('/enable', (req, res) => otpController.enable(req, res));
+otpRouter.post(
+  '/enable',
+  asyncHandler((req, res) => otpController.enable(req, res)),
+);
 
 /**
  * @swagger
@@ -56,6 +61,7 @@ otpRouter.post('/enable', (req, res) => otpController.enable(req, res));
  *     summary: Verifica un token OTP
  *     security:
  *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,7 +90,10 @@ otpRouter.post('/enable', (req, res) => otpController.enable(req, res));
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post('/verify', (req, res) => otpController.verify(req, res));
+otpRouter.post(
+  '/verify',
+  asyncHandler((req, res) => otpController.verify(req, res)),
+);
 
 /**
  * @swagger
@@ -94,6 +103,7 @@ otpRouter.post('/verify', (req, res) => otpController.verify(req, res));
  *     summary: Disabilita l'autenticazione a due fattori per l'utente
  *     security:
  *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -114,4 +124,7 @@ otpRouter.post('/verify', (req, res) => otpController.verify(req, res));
  *       400:
  *         description: Errore nella richiesta
  */
-otpRouter.post('/disable', (req, res) => otpController.disable(req, res));
+otpRouter.post(
+  '/disable',
+  asyncHandler((req, res) => otpController.disable(req, res)),
+);

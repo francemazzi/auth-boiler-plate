@@ -10,7 +10,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:8080',
+        url: 'http://localhost:8081',
         description: 'Development server',
       },
     ],
@@ -20,6 +20,12 @@ const options: swaggerJsdoc.Options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
+        },
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'auth_token',
+          description: 'JWT stored in HttpOnly cookie auth_token',
         },
       },
     },

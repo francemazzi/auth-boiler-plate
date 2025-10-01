@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM oven/bun:alpine
 
 # Install git
 RUN apk add --no-cache git
@@ -10,19 +10,19 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci
+RUN bun install
 
 # Copy source code
 COPY . .
 
 # Generate Prisma Client
-RUN npm run prisma:generate
+RUN bunx prisma generate
 
 # Build TypeScript
-RUN npm run build
+RUN bunx tsc
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8081
 
-# Start the application
-CMD ["npm", "start"] 
+# Start the application (run built JS via Bun)
+CMD ["bun", "./dist/infrastructure/http/server.js"]
