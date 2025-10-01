@@ -37,7 +37,8 @@ describe('AuthController', () => {
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
-    };
+      cookie: jest.fn().mockReturnThis(),
+    } as unknown as Partial<Response>;
   });
 
   describe('register', () => {
