@@ -128,6 +128,120 @@ src/
 └── test/               # Test Suites
 ```
 
+## 🧱 Hexagonal Architecture (Ports & Adapters)
+
+This project follows Hexagonal Architecture (a.k.a. Ports & Adapters) to keep the core business independent from frameworks, databases and I/O details.
+
+- **Domain (Core)**: business rules expressed via `entities`, `errors`, and domain `types`.
+- **Application**: orchestration of use-cases (application services) that coordinate domain logic and ports.
+- **Infrastructure**: adapters for the outside world (HTTP controllers, repositories implementation, email/otp services, DB, etc.).
+
+### Principles
+
+- **Dependency Rule**: inner layers don’t depend on outer layers. `domain` knows nothing about HTTP/DB; `application` depends on `domain`, never the opposite.
+- **Ports**: interfaces in `domain/repositories` (and service contracts) define what the core needs from the outside.
+- **Adapters**: concrete implementations in `infrastructure` satisfy those ports (e.g., `PrismaUserRepository` implements `IUserRepository`).
+- **Thin Controllers**: controllers should not contain business logic; they validate/parse input and delegate to use-cases or repositories based on complexity.
+
+### Use-Cases: When to Use Them
+
+Use-cases are application services meant for flows that are more than a trivial CRUD operation.
+
+Create a use-case when you have one or more of the following:
+
+- **Business Orchestration**: multiple steps, transactions, or calls across repositories/services.
+- **Domain Invariants**: validations and rules that must be enforced consistently.
+- **Side Effects**: sending emails, publishing events, generating tokens, etc.
+- **Cross-Cutting Concerns**: idempotency, auditing, retries, compensations.
+
+Avoid creating a use-case for very simple CRUD where the controller can safely call a repository method directly with minimal validation.
+
+### Examples
+
+#### 1) Simple CRUD (No Use-Case)
+
+A very simple update that doesn’t require orchestration can call the repository directly from the controller.
+
+```ts
+// src/infrastructure/http/controllers/UserController.ts
+import { Request, Response } from 'express';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+
+export class UserController {
+  constructor(private readonly userRepository: IUserRepository) {}
+
+  // Example: update display name is a trivial CRUD with minimal rules
+  updateProfile = async (req: Request, res: Response) => {
+    const { displayName } = req.body;
+    // Minimal validation; no complex rules
+    const user = await this.userRepository.updateDisplayName(req.user!.id, displayName);
+    res.json({ id: user.id, displayName: user.displayName });
+  };
+}
+```
+
+When the logic is only “validate input → persist → return”, a dedicated use-case often adds unnecessary indirection.
+
+#### 2) Complex Flow (Use-Case)
+
+Changing a password (as example) touches security rules, hashing, and validations. This is a good candidate for a use-case.
+
+```ts
+// src/application/use-cases/auth/ChangePasswordUseCase.ts
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import { AppError } from '../../../domain/errors/AppError';
+
+export interface PasswordHasher {
+  hash(plain: string): Promise<string>;
+  verify(plain: string, hashed: string): Promise<boolean>;
+}
+
+export class ChangePasswordUseCase {
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly hasher: PasswordHasher,
+  ) {}
+
+  async execute(input: {
+    userId: string;
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<void> {
+    const user = await this.userRepository.findById(input.userId);
+    if (!user) throw new AppError('User not found', 404);
+
+    const isValid = await this.hasher.verify(input.currentPassword, user.password);
+    if (!isValid) throw new AppError('Invalid credentials', 401);
+
+    const newHashed = await this.hasher.hash(input.newPassword);
+    await this.userRepository.updatePassword(user.id, newHashed);
+  }
+}
+```
+
+Controller delegates to the use-case, keeping HTTP concerns separate from business orchestration:
+
+```ts
+// src/infrastructure/http/controllers/AuthController.ts
+import { Request, Response } from 'express';
+import { ChangePasswordUseCase } from '../../../application/use-cases/auth/ChangePasswordUseCase';
+
+export class AuthController {
+  constructor(private readonly changePassword: ChangePasswordUseCase) {}
+
+  changePasswordHandler = async (req: Request, res: Response) => {
+    await this.changePassword.execute({
+      userId: req.user!.id,
+      currentPassword: req.body.currentPassword,
+      newPassword: req.body.newPassword,
+    });
+    res.status(204).send();
+  };
+}
+```
+
+This mirrors existing use-cases like `RegisterUseCase`, `LoginUseCase`, `VerifyEmailUseCase`, and OTP flows, which coordinate repositories and external services (email, OTP) while enforcing domain rules.
+
 ## 🔧 Environment Variables
 
 ```env
