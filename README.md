@@ -165,3 +165,17 @@ MIT © [Francesco Mazzi](LICENSE)
 Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
 
 </div>
+
+### 🧪 Integration Tests
+
+This project includes integration tests that run against a real Postgres (e.g., via docker-compose) and exercise the API routes using Supertest.
+
+```bash
+# Start services (Postgres, MailHog)
+npm run docker:up
+
+# Run integration suite
+npm run test:integration
+```
+
+Integration tests live in `test-integration/`. They reuse the actual Express app via `src/infrastructure/http/appFactory.ts` without starting an HTTP listener, and clean the DB between tests.
