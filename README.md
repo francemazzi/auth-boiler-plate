@@ -291,8 +291,6 @@ MIT © [Francesco Mazzi](LICENSE)
 
 <div align="center">
 
-Made with ❤️ by [Francesco Mazzi](https://github.com/francemazzi)
-
 </div>
 
 ## 👥 Contributors
