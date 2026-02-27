@@ -1,6 +1,6 @@
 {
   "name": "create-express-auth",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Create a new Express.js project with authentication using: npx create-express-auth my-app",
   "publishConfig": {
