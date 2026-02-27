@@ -92,11 +92,20 @@ export class AuthController {
       throw AppError.notFound('User not found', 'USER_NOT_FOUND');
     }
 
+    const tokenMetadata =
+      request.user.iat && request.user.exp
+        ? {
+            issuedAt: new Date(request.user.iat * 1000).toISOString(),
+            expiresAt: new Date(request.user.exp * 1000).toISOString(),
+          }
+        : undefined;
+
     return response.json({
       id: user.id,
       email: user.email,
       name: user.name,
       emailVerified: user.emailVerified,
+      ...(tokenMetadata ? { token: tokenMetadata } : {}),
     });
   }
 }

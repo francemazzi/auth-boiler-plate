@@ -167,6 +167,15 @@ authRouter.get(
  *                   type: string
  *                 emailVerified:
  *                   type: boolean
+ *                 token:
+ *                   type: object
+ *                   properties:
+ *                     issuedAt:
+ *                       type: string
+ *                       format: date-time
+ *                     expiresAt:
+ *                       type: string
+ *                       format: date-time
  *       401:
  *         description: Unauthorized
  *       404:

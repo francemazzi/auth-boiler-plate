@@ -19,7 +19,11 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret') as JwtPayload;
-    req.user = { id: decoded.userId };
+    req.user = {
+      id: decoded.userId,
+      iat: decoded.iat,
+      exp: decoded.exp,
+    };
     return next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid token' });

@@ -60,6 +60,16 @@ describe('Auth routes (integration)', () => {
     const res = await request(app).get('/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
+    expect(res.body?.id).toBeDefined();
     expect(res.body?.email).toBe(testUser.email);
+    expect(res.body?.emailVerified).toBe(false);
+    expect(res.body?.token?.issuedAt).toBeDefined();
+    expect(res.body?.token?.expiresAt).toBeDefined();
+
+    const issuedAt = Date.parse(res.body?.token?.issuedAt as string);
+    const expiresAt = Date.parse(res.body?.token?.expiresAt as string);
+    expect(Number.isNaN(issuedAt)).toBe(false);
+    expect(Number.isNaN(expiresAt)).toBe(false);
+    expect(expiresAt).toBeGreaterThan(issuedAt);
   });
 });
