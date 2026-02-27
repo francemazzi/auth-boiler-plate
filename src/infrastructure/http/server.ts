@@ -1,4 +1,4 @@
-import { AppFactory } from './appFactory';
+import { AppFactory } from './appFactory.js';
 
 const app = AppFactory.create();
 const port = process.env.PORT || 8081;

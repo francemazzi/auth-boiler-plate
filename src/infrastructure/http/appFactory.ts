@@ -4,10 +4,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
-import { router } from './routes';
-import { errorHandler } from './middlewares/error';
-import { rateLimiter } from './middlewares/rateLimiter';
-import { swaggerSpec } from './swagger';
+import { router } from './routes/index.js';
+import { errorHandler } from './middlewares/error.js';
+import { rateLimiter } from './middlewares/rateLimiter.js';
+import { swaggerSpec } from './swagger.js';
 
 export class AppFactory {
   public static create(): express.Express {

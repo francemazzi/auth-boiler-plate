@@ -3,14 +3,15 @@ services:
   app:
     build: .
     ports:
-      - '8081:8081'
+      - '${APP_PORT:-8181}:8081'
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth-boiler-plate?schema=public
       - JWT_SECRET=change-this-secret-in-production
       - JWT_EXPIRES_IN="1d"
       - SMTP_HOST=mailhog
       - SMTP_PORT=1025
-      - FRONTEND_URL=http://localhost:8081
+      - FRONTEND_URL=http://localhost:${APP_PORT:-8181}
+      - BACKEND_URL=http://localhost:${APP_PORT:-8181}
       - NODE_ENV=development
     volumes:
       - .:/usr/src/app
@@ -31,7 +32,7 @@ services:
     image: postgres:15.5-alpine
     platform: linux/arm64
     ports:
-      - '5432:5432'
+      - '${POSTGRES_PORT:-5532}:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -48,8 +49,8 @@ services:
     image: jcalonso/mailhog:v1.0.1
     platform: linux/arm64
     ports:
-      - '1025:1025' # SMTP server
-      - '8025:8025' # Web interface
+      - '${SMTP_PORT:-1125}:1025' # SMTP server
+      - '${MAILHOG_UI_PORT:-8125}:8025' # Web interface
 
 volumes:
   postgres_data:

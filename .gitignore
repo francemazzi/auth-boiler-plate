@@ -50,3 +50,4 @@ coverage/
 # Prisma
 prisma/*.db
 prisma/migrations/
+src/generated/

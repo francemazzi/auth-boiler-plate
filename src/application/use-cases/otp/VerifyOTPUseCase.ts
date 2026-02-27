@@ -1,21 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-import { OTPService } from "../../../infrastructure/services/OTPService";
-import { VerifyOTPRequest } from "../../../domain/types/otp";
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { IOTPService } from '../../../domain/services/IOTPService.js';
+import { VerifyOTPRequest } from '../../../domain/types/otp.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 export class VerifyOTPUseCase {
-  constructor(private prisma: PrismaClient, private otpService: OTPService) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private otpService: IOTPService,
+  ) {}
 
   async execute({ userId, token }: VerifyOTPRequest): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new Error("Utente non trovato");
+      throw AppError.notFound('User not found', 'USER_NOT_FOUND');
     }
 
     if (!user.otpEnabled) {
-      throw new Error("OTP non abilitato per questo utente");
+      throw AppError.badRequest('OTP not enabled for this user', 'OTP_NOT_ENABLED');
     }
 
     return this.otpService.verifyToken(userId, token);

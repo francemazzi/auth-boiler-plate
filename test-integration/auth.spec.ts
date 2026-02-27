@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { AppFactory } from '../src/infrastructure/http/appFactory';
-import { integrationCleanup } from './cleanup';
+import { AppFactory } from '../src/infrastructure/http/appFactory.js';
+import { integrationCleanup } from './cleanup.js';
 
 describe('Auth routes (integration)', () => {
   const app = AppFactory.create();

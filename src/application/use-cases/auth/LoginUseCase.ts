@@ -1,6 +1,7 @@
-import { compare } from "bcryptjs";
-import { sign } from "jsonwebtoken";
-import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { IPasswordService } from '../../../domain/services/IPasswordService.js';
+import { ITokenService } from '../../../domain/services/ITokenService.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 interface LoginDTO {
   email: string;
@@ -17,30 +18,26 @@ interface LoginResponse {
 }
 
 export class LoginUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private passwordService: IPasswordService,
+    private tokenService: ITokenService,
+  ) {}
 
   async execute({ email, password }: LoginDTO): Promise<LoginResponse> {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
-      throw new Error("Invalid credentials");
+      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
-    const passwordMatch = await compare(password, user.password);
+    const passwordMatch = await this.passwordService.compare(password, user.password);
 
     if (!passwordMatch) {
-      throw new Error("Invalid credentials");
+      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
-    const token = sign(
-      {
-        userId: user.id,
-      },
-      process.env.JWT_SECRET || "default_secret",
-      {
-        expiresIn: "1d",
-      }
-    );
+    const token = this.tokenService.sign({ userId: user.id }, '1d');
 
     return {
       token,

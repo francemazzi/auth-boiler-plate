@@ -1,15 +1,19 @@
-import { AuthController } from '../infrastructure/http/controllers/AuthController';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import { AuthController } from '../infrastructure/http/controllers/AuthController.js';
 import { Request, Response } from 'express';
-import { RegisterUseCase } from '../application/use-cases/auth/RegisterUseCase';
-import { LoginUseCase } from '../application/use-cases/auth/LoginUseCase';
-import { VerifyEmailUseCase } from '../application/use-cases/auth/VerifyEmailUseCase';
-import { IUserRepository } from '../domain/repositories/IUserRepository';
-import { User } from '@prisma/client';
-import { AppError } from '../domain/errors/AppError';
+import { RegisterUseCase } from '../application/use-cases/auth/RegisterUseCase.js';
+import { LoginUseCase } from '../application/use-cases/auth/LoginUseCase.js';
+import { VerifyEmailUseCase } from '../application/use-cases/auth/VerifyEmailUseCase.js';
+import { IUserRepository } from '../domain/repositories/IUserRepository.js';
+import { IPasswordService } from '../domain/services/IPasswordService.js';
+import { ITokenService } from '../domain/services/ITokenService.js';
+import { IEmailService } from '../domain/services/IEmailService.js';
+import { User } from '../domain/entities/User.js';
+import { AppError } from '../domain/errors/AppError.js';
 
-jest.mock('../application/use-cases/auth/RegisterUseCase');
-jest.mock('../application/use-cases/auth/LoginUseCase');
-jest.mock('../application/use-cases/auth/VerifyEmailUseCase');
+jest.mock('../application/use-cases/auth/RegisterUseCase.js');
+jest.mock('../application/use-cases/auth/LoginUseCase.js');
+jest.mock('../application/use-cases/auth/VerifyEmailUseCase.js');
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -19,6 +23,9 @@ describe('AuthController', () => {
   let loginUseCase: jest.Mocked<LoginUseCase>;
   let verifyEmailUseCase: jest.Mocked<VerifyEmailUseCase>;
   let mockUserRepository: jest.Mocked<IUserRepository>;
+  let mockPasswordService: jest.Mocked<IPasswordService>;
+  let mockTokenService: jest.Mocked<ITokenService>;
+  let mockEmailService: jest.Mocked<IEmailService>;
 
   beforeEach(() => {
     mockUserRepository = {
@@ -29,9 +36,32 @@ describe('AuthController', () => {
       delete: jest.fn(),
     } as jest.Mocked<IUserRepository>;
 
-    registerUseCase = jest.mocked(new RegisterUseCase(mockUserRepository));
-    loginUseCase = jest.mocked(new LoginUseCase(mockUserRepository));
-    verifyEmailUseCase = jest.mocked(new VerifyEmailUseCase(mockUserRepository));
+    mockPasswordService = {
+      hash: jest.fn(),
+      compare: jest.fn(),
+    } as jest.Mocked<IPasswordService>;
+
+    mockTokenService = {
+      sign: jest.fn(),
+      verify: jest.fn(),
+    } as jest.Mocked<ITokenService>;
+
+    mockEmailService = {
+      sendWelcomeEmail: jest.fn(),
+    } as jest.Mocked<IEmailService>;
+
+    registerUseCase = jest.mocked(
+      new RegisterUseCase(
+        mockUserRepository,
+        mockPasswordService,
+        mockTokenService,
+        mockEmailService,
+      ),
+    );
+    loginUseCase = jest.mocked(
+      new LoginUseCase(mockUserRepository, mockPasswordService, mockTokenService),
+    );
+    verifyEmailUseCase = jest.mocked(new VerifyEmailUseCase(mockUserRepository, mockTokenService));
 
     authController = new AuthController(registerUseCase, loginUseCase, verifyEmailUseCase);
     mockResponse = {
@@ -53,16 +83,16 @@ describe('AuthController', () => {
         body: mockUser,
       };
 
-      const mockRegisteredUser: User = {
-        id: '1',
-        email: mockUser.email,
-        password: 'hashedPassword',
-        name: mockUser.name,
-        emailVerified: false,
-        otpEnabled: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const mockRegisteredUser = new User(
+        '1',
+        mockUser.email,
+        'hashedPassword',
+        mockUser.name,
+        false,
+        false,
+        new Date(),
+        new Date(),
+      );
 
       jest.spyOn(registerUseCase, 'execute').mockResolvedValue(mockRegisteredUser);
 
@@ -78,20 +108,28 @@ describe('AuthController', () => {
       });
     });
 
-    it('should handle registration error', async () => {
-      const mockUser = {
-        email: 'test@example.com',
-        password: 'Password123!',
-        name: 'Test User',
+    it('should throw on missing fields', async () => {
+      mockRequest = {
+        body: { email: 'test@example.com' },
       };
 
+      await expect(
+        authController.register(mockRequest as Request, mockResponse as Response),
+      ).rejects.toThrow(AppError);
+    });
+
+    it('should propagate use case errors', async () => {
       mockRequest = {
-        body: mockUser,
+        body: {
+          email: 'test@example.com',
+          password: 'Password123!',
+          name: 'Test User',
+        },
       };
 
       jest
         .spyOn(registerUseCase, 'execute')
-        .mockRejectedValue(new AppError(409, 'Email already exists', 'USER_EXISTS'));
+        .mockRejectedValue(AppError.conflict('User already exists', 'USER_EXISTS'));
 
       await expect(
         authController.register(mockRequest as Request, mockResponse as Response),
@@ -130,19 +168,27 @@ describe('AuthController', () => {
       });
     });
 
-    it('should handle invalid credentials', async () => {
-      const mockCredentials = {
-        email: 'test@example.com',
-        password: 'WrongPassword',
+    it('should throw on missing credentials', async () => {
+      mockRequest = {
+        body: { email: 'test@example.com' },
       };
 
+      await expect(
+        authController.login(mockRequest as Request, mockResponse as Response),
+      ).rejects.toThrow(AppError);
+    });
+
+    it('should propagate invalid credentials error', async () => {
       mockRequest = {
-        body: mockCredentials,
+        body: {
+          email: 'test@example.com',
+          password: 'WrongPassword',
+        },
       };
 
       jest
         .spyOn(loginUseCase, 'execute')
-        .mockRejectedValue(new AppError(401, 'Invalid credentials', 'INVALID_CREDENTIALS'));
+        .mockRejectedValue(AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS'));
 
       await expect(
         authController.login(mockRequest as Request, mockResponse as Response),
@@ -169,7 +215,7 @@ describe('AuthController', () => {
       });
     });
 
-    it('should handle invalid verification token', async () => {
+    it('should propagate invalid token error', async () => {
       const mockToken = 'invalid-token';
 
       mockRequest = {
@@ -178,7 +224,7 @@ describe('AuthController', () => {
 
       jest
         .spyOn(verifyEmailUseCase, 'execute')
-        .mockRejectedValue(new AppError(400, 'Invalid verification token', 'INVALID_TOKEN'));
+        .mockRejectedValue(AppError.badRequest('Invalid verification token', 'INVALID_TOKEN'));
 
       await expect(
         authController.verifyEmail(mockRequest as Request, mockResponse as Response),

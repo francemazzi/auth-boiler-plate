@@ -1,5 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../../../domain/errors/AppError';
+import { AppError, ErrorType } from '../../../domain/errors/AppError.js';
+
+const errorTypeToStatusCode: Record<ErrorType, number> = {
+  [ErrorType.VALIDATION]: 400,
+  [ErrorType.UNAUTHORIZED]: 401,
+  [ErrorType.FORBIDDEN]: 403,
+  [ErrorType.NOT_FOUND]: 404,
+  [ErrorType.CONFLICT]: 409,
+  [ErrorType.INTERNAL]: 500,
+};
 
 export const errorHandler = (
   err: Error | AppError,
@@ -14,7 +23,8 @@ export const errorHandler = (
   });
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    const statusCode = errorTypeToStatusCode[err.type];
+    return res.status(statusCode).json({
       status: 'error',
       message: err.message,
       code: err.code,

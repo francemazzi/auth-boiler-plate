@@ -1,6 +1,7 @@
 import { Socket } from 'net';
+import { IEmailService } from '../../domain/services/IEmailService.js';
 
-export class EmailService {
+export class EmailService implements IEmailService {
   private readonly host: string;
   private readonly port: number;
 

@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
-import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase';
-import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase';
-import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase';
-import { AppError } from '../../../domain/errors/AppError';
+import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase.js';
+import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase.js';
+import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase.js';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly verifyEmailUseCase: VerifyEmailUseCase,
+    private readonly userRepository?: IUserRepository,
   ) {}
 
   async register(request: Request, response: Response): Promise<Response> {
@@ -18,26 +20,19 @@ export class AuthController {
       throw AppError.badRequest('Missing required fields', 'MISSING_FIELDS');
     }
 
-    try {
-      const user = await this.registerUseCase.execute({
-        email,
-        password,
-        name,
-      });
+    const user = await this.registerUseCase.execute({
+      email,
+      password,
+      name,
+    });
 
-      return response.status(201).json({
-        status: 'success',
-        data: {
-          user,
-          message: 'User registered successfully',
-        },
-      });
-    } catch (error) {
-      if (error.message.includes('already exists')) {
-        throw AppError.conflict(error.message, 'USER_EXISTS');
-      }
-      throw AppError.internal('Registration failed');
-    }
+    return response.status(201).json({
+      status: 'success',
+      data: {
+        user,
+        message: 'User registered successfully',
+      },
+    });
   }
 
   async login(request: Request, response: Response): Promise<Response> {
@@ -47,26 +42,22 @@ export class AuthController {
       throw AppError.badRequest('Email and password are required', 'MISSING_CREDENTIALS');
     }
 
-    try {
-      const result = await this.loginUseCase.execute({
-        email,
-        password,
-      });
+    const result = await this.loginUseCase.execute({
+      email,
+      password,
+    });
 
-      response.cookie('auth_token', result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+    response.cookie('auth_token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
-      return response.status(200).json({
-        status: 'success',
-        data: result,
-      });
-    } catch (error) {
-      throw AppError.unauthorized(error.message, 'INVALID_CREDENTIALS');
-    }
+    return response.status(200).json({
+      status: 'success',
+      data: result,
+    });
   }
 
   async verifyEmail(request: Request, response: Response): Promise<Response> {
@@ -76,17 +67,36 @@ export class AuthController {
       throw AppError.badRequest('Token is required', 'MISSING_TOKEN');
     }
 
-    try {
-      await this.verifyEmailUseCase.execute({
-        token: token as string,
-      });
+    await this.verifyEmailUseCase.execute({
+      token: token as string,
+    });
 
-      return response.status(200).json({
-        status: 'success',
-        message: 'Email verified successfully',
-      });
-    } catch (error) {
-      throw AppError.badRequest(error.message, 'INVALID_TOKEN');
+    return response.status(200).json({
+      status: 'success',
+      message: 'Email verified successfully',
+    });
+  }
+
+  async me(request: Request, response: Response): Promise<Response> {
+    if (!request.user) {
+      throw AppError.unauthorized('User not authenticated', 'NOT_AUTHENTICATED');
     }
+
+    if (!this.userRepository) {
+      throw AppError.internal('User repository not configured');
+    }
+
+    const user = await this.userRepository.findById(request.user.id);
+
+    if (!user) {
+      throw AppError.notFound('User not found', 'USER_NOT_FOUND');
+    }
+
+    return response.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      emailVerified: user.emailVerified,
+    });
   }
 }

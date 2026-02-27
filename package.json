@@ -1,14 +1,15 @@
 {
   "name": "create-express-auth",
   "version": "1.5.3",
+  "type": "module",
   "description": "Create a new Express.js project with authentication using: npx create-express-auth my-app",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
-  "main": "./bin/block-install.js",
+  "main": "./bin/block-install.cjs",
   "bin": {
-    "create-express-auth": "./bin/create-express-auth.js"
+    "create-express-auth": "./bin/create-express-auth.cjs"
   },
   "repository": {
     "type": "git",
@@ -16,16 +17,16 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "dev": "ts-node-dev --respawn --transpile-only src/infrastructure/http/server.ts",
-    "build": "tsc",
+    "dev": "tsx watch src/infrastructure/http/server.ts",
+    "build": "prisma generate && tsc && node -e \"require('fs').cpSync('src/infrastructure/http/public', 'dist/infrastructure/http/public', {recursive: true})\"",
     "start": "node dist/infrastructure/http/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "seed": "ts-node prisma/seed.ts",
-    "test": "jest --passWithNoTests",
-    "test:integration": "jest -c jest.integration.config.js --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "seed": "tsx prisma/seed.ts",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --passWithNoTests",
+    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest -c jest.integration.config.mjs --passWithNoTests",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
@@ -37,7 +38,7 @@
     "config:init": "node ./bin/init-config.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "preferGlobal": false,
   "keywords": [
@@ -55,7 +56,8 @@
   "author": "Francesco Mazzi",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "5.10.2",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "@types/cookie-parser": "^1.4.9",
     "axios": "1.6.7",
     "bcryptjs": "2.4.3",
@@ -66,6 +68,7 @@
     "express-validator": "7.0.1",
     "glob": "10.3.10",
     "jsonwebtoken": "9.0.2",
+    "pg": "^8.13.0",
     "lru-cache": "10.2.0",
     "qrcode": "1.5.3",
     "speakeasy": "2.0.0",
@@ -80,6 +83,7 @@
     "@types/jest": "29.5.12",
     "@types/jsonwebtoken": "9.0.5",
     "@types/node": "20.11.20",
+    "@types/pg": "^8.11.0",
     "@types/qrcode": "1.5.5",
     "@types/speakeasy": "2.0.10",
     "@types/supertest": "2.0.16",
@@ -94,11 +98,11 @@
     "jest-mock-extended": "3.0.5",
     "lint-staged": "15.2.2",
     "prettier": "3.2.5",
-    "prisma": "5.10.2",
+    "prisma": "^7.3.0",
     "rimraf": "5.0.5",
     "supertest": "^6.3.4",
-    "ts-jest": "29.1.2",
-    "ts-node-dev": "2.0.0",
-    "typescript": "5.3.3"
+    "ts-jest": "^29.2.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.9.0"
   }
 }

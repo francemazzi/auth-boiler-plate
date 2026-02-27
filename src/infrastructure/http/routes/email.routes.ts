@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { EmailController } from '../controllers/EmailController';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { EmailService } from '../../services/EmailService';
+import { EmailController } from '../controllers/EmailController.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { EmailService } from '../../services/EmailService.js';
 
 export const emailRouter = Router();
 const emailService = new EmailService();
@@ -11,7 +11,7 @@ const emailController = new EmailController(emailService);
  * @swagger
  * /email/test:
  *   post:
- *     summary: Invia una email di test (MailHog)
+ *     summary: Send a test email (MailHog)
  *     tags: [Email]
  *     requestBody:
  *       required: true
@@ -27,9 +27,9 @@ const emailController = new EmailController(emailService);
  *                 format: email
  *     responses:
  *       200:
- *         description: Email di test inviata
+ *         description: Test email sent
  *       400:
- *         description: Email mancante o invalida
+ *         description: Missing or invalid email
  */
 emailRouter.post(
   '/test',

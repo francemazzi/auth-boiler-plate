@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { EmailService } from '../../services/EmailService';
-import { AppError } from '../../../domain/errors/AppError';
+import { EmailService } from '../../services/EmailService.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}

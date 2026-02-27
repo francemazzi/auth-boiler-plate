@@ -1,32 +1,28 @@
-import { PrismaClient } from "@prisma/client";
-import { OTPService } from "../../../infrastructure/services/OTPService";
-import { EnableOTPRequest, EnableOTPResponse } from "../../../domain/types/otp";
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { IOTPService } from '../../../domain/services/IOTPService.js';
+import { EnableOTPRequest, EnableOTPResponse } from '../../../domain/types/otp.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 export class EnableOTPUseCase {
-  constructor(private prisma: PrismaClient, private otpService: OTPService) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private otpService: IOTPService,
+  ) {}
 
   async execute({ userId }: EnableOTPRequest): Promise<EnableOTPResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new Error("Utente non trovato");
+      throw AppError.notFound('User not found', 'USER_NOT_FOUND');
     }
 
     if (user.otpEnabled) {
-      throw new Error("OTP già abilitato per questo utente");
+      throw AppError.conflict('OTP already enabled for this user', 'OTP_ALREADY_ENABLED');
     }
 
-    const { secret, qrCode } = await this.otpService.generateSecret(
-      userId,
-      user.email
-    );
+    const { secret, qrCode } = await this.otpService.generateSecret(userId, user.email);
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { otpEnabled: true },
-    });
+    await this.userRepository.update(userId, { ...user, otpEnabled: true });
 
     return { secret, qrCode };
   }

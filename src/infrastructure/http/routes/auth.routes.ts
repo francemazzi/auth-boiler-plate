@@ -1,28 +1,43 @@
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { AuthController } from '../controllers/AuthController';
-import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase';
-import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase';
-import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase';
-import { PrismaUserRepository } from '../../repositories/PrismaUserRepository';
-import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
-import { asyncHandler } from '../middlewares/asyncHandler';
+import { Router } from 'express';
+import { AuthController } from '../controllers/AuthController.js';
+import { RegisterUseCase } from '../../../application/use-cases/auth/RegisterUseCase.js';
+import { LoginUseCase } from '../../../application/use-cases/auth/LoginUseCase.js';
+import { VerifyEmailUseCase } from '../../../application/use-cases/auth/VerifyEmailUseCase.js';
+import { PrismaUserRepository } from '../../repositories/PrismaUserRepository.js';
+import { BcryptPasswordService } from '../../services/BcryptPasswordService.js';
+import { JwtTokenService } from '../../services/JwtTokenService.js';
+import { EmailService } from '../../services/EmailService.js';
+import { authenticate } from '../middlewares/auth.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { prisma } from '../../database/prisma.js';
 
 const authRouter = Router();
-const prisma = new PrismaClient();
 const userRepository = new PrismaUserRepository(prisma);
+const passwordService = new BcryptPasswordService();
+const tokenService = new JwtTokenService();
+const emailService = new EmailService();
 
-const registerUseCase = new RegisterUseCase(userRepository);
-const loginUseCase = new LoginUseCase(userRepository);
-const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
+const registerUseCase = new RegisterUseCase(
+  userRepository,
+  passwordService,
+  tokenService,
+  emailService,
+);
+const loginUseCase = new LoginUseCase(userRepository, passwordService, tokenService);
+const verifyEmailUseCase = new VerifyEmailUseCase(userRepository, tokenService);
 
-const authController = new AuthController(registerUseCase, loginUseCase, verifyEmailUseCase);
+const authController = new AuthController(
+  registerUseCase,
+  loginUseCase,
+  verifyEmailUseCase,
+  userRepository,
+);
 
 /**
  * @swagger
  * /auth/register:
  *   post:
- *     summary: Registra un nuovo utente
+ *     summary: Register a new user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -45,11 +60,11 @@ const authController = new AuthController(registerUseCase, loginUseCase, verifyE
  *                 type: string
  *     responses:
  *       201:
- *         description: Utente registrato con successo
+ *         description: User registered successfully
  *       400:
- *         description: Errore nella registrazione
+ *         description: Registration error
  *       409:
- *         description: Utente già esistente
+ *         description: User already exists
  */
 authRouter.post(
   '/register',
@@ -60,7 +75,7 @@ authRouter.post(
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Effettua il login
+ *     summary: Login
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -79,7 +94,7 @@ authRouter.post(
  *                 type: string
  *     responses:
  *       200:
- *         description: Login effettuato con successo
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -97,7 +112,7 @@ authRouter.post(
  *                     name:
  *                       type: string
  *       400:
- *         description: Credenziali non valide
+ *         description: Invalid credentials
  */
 authRouter.post(
   '/login',
@@ -108,7 +123,7 @@ authRouter.post(
  * @swagger
  * /auth/verify:
  *   get:
- *     summary: Verifica l'email dell'utente
+ *     summary: Verify user email
  *     tags: [Auth]
  *     parameters:
  *       - in: query
@@ -118,9 +133,9 @@ authRouter.post(
  *           type: string
  *     responses:
  *       200:
- *         description: Email verificata con successo
+ *         description: Email verified successfully
  *       400:
- *         description: Token non valido
+ *         description: Invalid token
  */
 authRouter.get(
   '/verify',
@@ -131,14 +146,14 @@ authRouter.get(
  * @swagger
  * /auth/me:
  *   get:
- *     summary: Ottiene i dati dell'utente corrente
+ *     summary: Get current user data
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Dati dell'utente
+ *         description: User data
  *         content:
  *           application/json:
  *             schema:
@@ -153,33 +168,14 @@ authRouter.get(
  *                 emailVerified:
  *                   type: boolean
  *       401:
- *         description: Non autorizzato
+ *         description: Unauthorized
  *       404:
- *         description: Utente non trovato
+ *         description: User not found
  */
-authRouter.get('/me', ensureAuthenticated, async (req: Request, res: Response) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
-    const user = await userRepository.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    return res.json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      emailVerified: user.emailVerified,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error instanceof Error ? error.message : 'Internal server error',
-    });
-  }
-});
+authRouter.get(
+  '/me',
+  authenticate,
+  asyncHandler((req, res) => authController.me(req, res)),
+);
 
 export { authRouter };

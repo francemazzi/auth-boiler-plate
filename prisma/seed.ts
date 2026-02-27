@@ -1,14 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcryptjs';
+import 'dotenv/config';
+import { PrismaClient } from '../src/generated/prisma/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   await prisma.user.deleteMany();
 
   console.log('Seeding database...');
 
-  const adminPassword = await hash('admin123', 8);
+  const adminPassword = await bcrypt.hash('admin123', 8);
   const admin = await prisma.user.create({
     data: {
       email: 'admin@example.com',
@@ -19,7 +22,7 @@ async function main() {
   });
   console.log('Created admin user:', admin.email);
 
-  const userPassword = await hash('user123', 8);
+  const userPassword = await bcrypt.hash('user123', 8);
   const users = await Promise.all(
     Array.from({ length: 5 }).map(async (_, i) => {
       const user = await prisma.user.create({

@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { jest, beforeAll, beforeEach } from '@jest/globals';
+import { PrismaClient } from '../generated/prisma/client.js';
 import { mockDeep, mockReset } from 'jest-mock-extended';
-import '@jest/globals';
 
 const prismaMock = mockDeep<PrismaClient>();
 
 beforeAll(() => {
-  jest.mock('@prisma/client', () => ({
+  jest.mock('../generated/prisma/client.js', () => ({
     PrismaClient: jest.fn(() => prismaMock),
   }));
 });

@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { prisma } from './prisma';
-import { integrationCleanup } from './cleanup';
+import { prisma } from './prisma.js';
+import { integrationCleanup } from './cleanup.js';
 
 beforeAll(async () => {
   await prisma.$connect();

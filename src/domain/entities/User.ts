@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID } from 'node:crypto';
 
 export class User {
   constructor(
@@ -7,12 +7,13 @@ export class User {
     public readonly password: string,
     public readonly name: string,
     public readonly emailVerified: boolean,
+    public readonly otpEnabled: boolean,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date
+    public readonly updatedAt: Date,
   ) {}
 
   static create(
-    props: Omit<User, "id" | "createdAt" | "updatedAt" | "emailVerified">
+    props: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'emailVerified' | 'otpEnabled'>,
   ): User {
     return new User(
       randomUUID(),
@@ -20,8 +21,9 @@ export class User {
       props.password,
       props.name,
       false,
+      false,
       new Date(),
-      new Date()
+      new Date(),
     );
   }
 }

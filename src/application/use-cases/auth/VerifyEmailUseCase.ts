@@ -1,11 +1,12 @@
-import { verify } from "jsonwebtoken";
-import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { ITokenService } from '../../../domain/services/ITokenService.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 interface VerifyEmailDTO {
   token: string;
 }
 
-interface TokenPayload {
+interface EmailVerificationPayload {
   userId: string;
   type: string;
   iat: number;
@@ -13,31 +14,33 @@ interface TokenPayload {
 }
 
 export class VerifyEmailUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private tokenService: ITokenService,
+  ) {}
 
   async execute({ token }: VerifyEmailDTO): Promise<void> {
+    let decoded: EmailVerificationPayload;
+
     try {
-      const decoded = verify(
-        token,
-        process.env.JWT_SECRET || "default_secret"
-      ) as TokenPayload;
-
-      if (decoded.type !== "email_verification") {
-        throw new Error("Invalid token type");
-      }
-
-      const user = await this.userRepository.findById(decoded.userId);
-
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      await this.userRepository.update(user.id, {
-        ...user,
-        emailVerified: true,
-      });
-    } catch (error) {
-      throw new Error("Invalid verification token");
+      decoded = this.tokenService.verify<EmailVerificationPayload>(token);
+    } catch {
+      throw AppError.badRequest('Invalid verification token', 'INVALID_TOKEN');
     }
+
+    if (decoded.type !== 'email_verification') {
+      throw AppError.badRequest('Invalid token type', 'INVALID_TOKEN_TYPE');
+    }
+
+    const user = await this.userRepository.findById(decoded.userId);
+
+    if (!user) {
+      throw AppError.notFound('User not found', 'USER_NOT_FOUND');
+    }
+
+    await this.userRepository.update(user.id, {
+      ...user,
+      emailVerified: true,
+    });
   }
 }

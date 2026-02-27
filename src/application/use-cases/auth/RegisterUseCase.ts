@@ -1,8 +1,9 @@
-import { hash } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-import { User } from '../../../domain/entities/User';
-import { IUserRepository } from '../../../domain/repositories/IUserRepository';
-import { EmailService } from '../../../infrastructure/services/EmailService';
+import { User } from '../../../domain/entities/User.js';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository.js';
+import { IPasswordService } from '../../../domain/services/IPasswordService.js';
+import { ITokenService } from '../../../domain/services/ITokenService.js';
+import { IEmailService } from '../../../domain/services/IEmailService.js';
+import { AppError } from '../../../domain/errors/AppError.js';
 
 interface RegisterDTO {
   email: string;
@@ -11,20 +12,21 @@ interface RegisterDTO {
 }
 
 export class RegisterUseCase {
-  private emailService: EmailService;
-
-  constructor(private userRepository: IUserRepository) {
-    this.emailService = new EmailService();
-  }
+  constructor(
+    private userRepository: IUserRepository,
+    private passwordService: IPasswordService,
+    private tokenService: ITokenService,
+    private emailService: IEmailService,
+  ) {}
 
   async execute({ email, password, name }: RegisterDTO): Promise<User> {
     const userExists = await this.userRepository.findByEmail(email);
 
     if (userExists) {
-      throw new Error('User already exists');
+      throw AppError.conflict('User already exists', 'USER_EXISTS');
     }
 
-    const hashedPassword = await hash(password, 8);
+    const hashedPassword = await this.passwordService.hash(password);
 
     const user = User.create({
       email,
@@ -34,18 +36,15 @@ export class RegisterUseCase {
 
     const createdUser = await this.userRepository.create(user);
 
-    const verificationToken = sign(
+    const verificationToken = this.tokenService.sign(
       {
         userId: createdUser.id,
         type: 'email_verification',
       },
-      process.env.JWT_SECRET || 'default_secret',
-      {
-        expiresIn: '1d',
-      },
+      '1d',
     );
 
-    // Best-effort email: non bloccare la registrazione se l'email fallisce
+    // Best-effort email: don't block registration if email fails
     try {
       await this.emailService.sendWelcomeEmail(
         createdUser.email,
@@ -53,7 +52,7 @@ export class RegisterUseCase {
         verificationToken,
       );
     } catch (_) {
-      // Intenzionalmente ignorato in sviluppo: l'invio email non deve invalidare la registrazione
+      // Intentionally ignored: email failure should not invalidate registration
     }
 
     return createdUser;

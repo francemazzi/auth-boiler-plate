@@ -1,20 +1,21 @@
 import { Router } from 'express';
-import { OTPController } from '../controllers/OTPController';
-import { PrismaClient } from '@prisma/client';
-import { OTPService } from '../../services/OTPService';
-import { EnableOTPUseCase } from '../../../application/use-cases/otp/EnableOTPUseCase';
-import { VerifyOTPUseCase } from '../../../application/use-cases/otp/VerifyOTPUseCase';
-import { DisableOTPUseCase } from '../../../application/use-cases/otp/DisableOTPUseCase';
-import { authenticate } from '../middlewares/auth';
-import { asyncHandler } from '../middlewares/asyncHandler';
+import { OTPController } from '../controllers/OTPController.js';
+import { OTPService } from '../../services/OTPService.js';
+import { PrismaUserRepository } from '../../repositories/PrismaUserRepository.js';
+import { EnableOTPUseCase } from '../../../application/use-cases/otp/EnableOTPUseCase.js';
+import { VerifyOTPUseCase } from '../../../application/use-cases/otp/VerifyOTPUseCase.js';
+import { DisableOTPUseCase } from '../../../application/use-cases/otp/DisableOTPUseCase.js';
+import { authenticate } from '../middlewares/auth.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { prisma } from '../../database/prisma.js';
 
 export const otpRouter = Router();
-const prisma = new PrismaClient();
+const userRepository = new PrismaUserRepository(prisma);
 const otpService = new OTPService(prisma);
 
-const enableOTPUseCase = new EnableOTPUseCase(prisma, otpService);
-const verifyOTPUseCase = new VerifyOTPUseCase(prisma, otpService);
-const disableOTPUseCase = new DisableOTPUseCase(prisma, otpService);
+const enableOTPUseCase = new EnableOTPUseCase(userRepository, otpService);
+const verifyOTPUseCase = new VerifyOTPUseCase(userRepository, otpService);
+const disableOTPUseCase = new DisableOTPUseCase(userRepository, otpService);
 
 const otpController = new OTPController(enableOTPUseCase, verifyOTPUseCase, disableOTPUseCase);
 
@@ -25,13 +26,13 @@ otpRouter.use(authenticate);
  * /otp/enable:
  *   post:
  *     tags: [OTP]
- *     summary: Abilita l'autenticazione a due fattori per l'utente
+ *     summary: Enable two-factor authentication for the user
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: OTP abilitato con successo
+ *         description: OTP enabled successfully
  *         content:
  *           application/json:
  *             schema:
@@ -39,14 +40,14 @@ otpRouter.use(authenticate);
  *               properties:
  *                 secret:
  *                   type: string
- *                   description: Il codice segreto per configurare l'app authenticator
+ *                   description: The secret code to configure the authenticator app
  *                 qrCode:
  *                   type: string
- *                   description: Il QR code da scansionare con l'app authenticator (base64)
+ *                   description: The QR code to scan with the authenticator app (base64)
  *       401:
- *         description: Non autorizzato
+ *         description: Unauthorized
  *       400:
- *         description: Errore nella richiesta
+ *         description: Request error
  */
 otpRouter.post(
   '/enable',
@@ -58,7 +59,7 @@ otpRouter.post(
  * /otp/verify:
  *   post:
  *     tags: [OTP]
- *     summary: Verifica un token OTP
+ *     summary: Verify an OTP token
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
@@ -73,10 +74,10 @@ otpRouter.post(
  *             properties:
  *               token:
  *                 type: string
- *                 description: Il token OTP da verificare
+ *                 description: The OTP token to verify
  *     responses:
  *       200:
- *         description: Token verificato con successo
+ *         description: Token verified successfully
  *         content:
  *           application/json:
  *             schema:
@@ -84,11 +85,11 @@ otpRouter.post(
  *               properties:
  *                 valid:
  *                   type: boolean
- *                   description: Indica se il token è valido
+ *                   description: Whether the token is valid
  *       401:
- *         description: Non autorizzato
+ *         description: Unauthorized
  *       400:
- *         description: Errore nella richiesta
+ *         description: Request error
  */
 otpRouter.post(
   '/verify',
@@ -100,7 +101,7 @@ otpRouter.post(
  * /otp/disable:
  *   post:
  *     tags: [OTP]
- *     summary: Disabilita l'autenticazione a due fattori per l'utente
+ *     summary: Disable two-factor authentication for the user
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
@@ -115,14 +116,14 @@ otpRouter.post(
  *             properties:
  *               token:
  *                 type: string
- *                 description: Il token OTP per confermare la disabilitazione
+ *                 description: The OTP token to confirm disabling
  *     responses:
  *       200:
- *         description: OTP disabilitato con successo
+ *         description: OTP disabled successfully
  *       401:
- *         description: Non autorizzato
+ *         description: Unauthorized
  *       400:
- *         description: Errore nella richiesta
+ *         description: Request error
  */
 otpRouter.post(
   '/disable',

@@ -1,9 +1,31 @@
-import { PrismaClient } from "@prisma/client";
-import { User } from "../../domain/entities/User";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { PrismaClient } from '../../generated/prisma/client.js';
+import { User } from '../../domain/entities/User.js';
+import { IUserRepository } from '../../domain/repositories/IUserRepository.js';
 
 export class PrismaUserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
+
+  private toDomain(record: {
+    id: string;
+    email: string;
+    password: string;
+    name: string;
+    emailVerified: boolean;
+    otpEnabled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }): User {
+    return new User(
+      record.id,
+      record.email,
+      record.password,
+      record.name,
+      record.emailVerified,
+      record.otpEnabled,
+      record.createdAt,
+      record.updatedAt,
+    );
+  }
 
   async create(user: User): Promise<User> {
     const createdUser = await this.prisma.user.create({
@@ -13,20 +35,13 @@ export class PrismaUserRepository implements IUserRepository {
         password: user.password,
         name: user.name,
         emailVerified: user.emailVerified,
+        otpEnabled: user.otpEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
     });
 
-    return new User(
-      createdUser.id,
-      createdUser.email,
-      createdUser.password,
-      createdUser.name,
-      createdUser.emailVerified,
-      createdUser.createdAt,
-      createdUser.updatedAt
-    );
+    return this.toDomain(createdUser);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -36,15 +51,7 @@ export class PrismaUserRepository implements IUserRepository {
 
     if (!user) return null;
 
-    return new User(
-      user.id,
-      user.email,
-      user.password,
-      user.name,
-      user.emailVerified,
-      user.createdAt,
-      user.updatedAt
-    );
+    return this.toDomain(user);
   }
 
   async findById(id: string): Promise<User | null> {
@@ -54,15 +61,7 @@ export class PrismaUserRepository implements IUserRepository {
 
     if (!user) return null;
 
-    return new User(
-      user.id,
-      user.email,
-      user.password,
-      user.name,
-      user.emailVerified,
-      user.createdAt,
-      user.updatedAt
-    );
+    return this.toDomain(user);
   }
 
   async update(id: string, userData: Partial<User>): Promise<User> {
@@ -71,15 +70,7 @@ export class PrismaUserRepository implements IUserRepository {
       data: userData,
     });
 
-    return new User(
-      updatedUser.id,
-      updatedUser.email,
-      updatedUser.password,
-      updatedUser.name,
-      updatedUser.emailVerified,
-      updatedUser.createdAt,
-      updatedUser.updatedAt
-    );
+    return this.toDomain(updatedUser);
   }
 
   async delete(id: string): Promise<void> {

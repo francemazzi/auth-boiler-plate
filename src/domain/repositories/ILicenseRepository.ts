@@ -1,4 +1,4 @@
-import { License } from "../entities/License";
+import { License } from '../entities/License.js';
 
 export interface ILicenseRepository {
   create(license: License): Promise<License>;

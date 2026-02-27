@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "lib": ["es2017", "esnext.asynciterable"],
+    "target": "ES2023",
+    "module": "NodeNext",
+    "lib": ["ES2023"],
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "removeComments": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -20,6 +20,7 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "isolatedModules": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
     "types": ["node", "jest"]

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authRouter } from './auth.routes';
-import { otpRouter } from './otp.routes';
-import { emailRouter } from './email.routes';
+import { authRouter } from './auth.routes.js';
+import { otpRouter } from './otp.routes.js';
+import { emailRouter } from './email.routes.js';
 
 export const router = Router();
 

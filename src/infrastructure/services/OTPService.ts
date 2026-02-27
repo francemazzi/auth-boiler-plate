@@ -1,14 +1,12 @@
-import * as speakeasy from "speakeasy";
-import * as QRCode from "qrcode";
-import { PrismaClient } from "@prisma/client";
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
+import type { PrismaClient } from '../../generated/prisma/client.js';
+import { IOTPService } from '../../domain/services/IOTPService.js';
 
-export class OTPService {
+export class OTPService implements IOTPService {
   constructor(private prisma: PrismaClient) {}
 
-  async generateSecret(
-    userId: string,
-    email: string
-  ): Promise<{ secret: string; qrCode: string }> {
+  async generateSecret(userId: string, email: string): Promise<{ secret: string; qrCode: string }> {
     const secretTemp = speakeasy.generateSecret({
       name: `AuthBoilerplate:${email}`,
     });
@@ -37,12 +35,12 @@ export class OTPService {
     });
 
     if (!otpSecret) {
-      throw new Error("OTP non configurato per questo utente");
+      throw new Error('OTP not configured for this user');
     }
 
     return speakeasy.totp.verify({
       secret: otpSecret.secret,
-      encoding: "base32",
+      encoding: 'base32',
       token,
     });
   }
@@ -50,11 +48,6 @@ export class OTPService {
   async deleteSecret(userId: string): Promise<void> {
     await this.prisma.oTPSecret.delete({
       where: { userId },
-    });
-
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { otpEnabled: false },
     });
   }
 }
